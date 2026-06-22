@@ -190,7 +190,7 @@ const ActivityTimeline = () => {
         }
 
         .timeline-view-pics-btn:hover {
-          color: #FF4A70;
+          color: #2B85F7;
           transform: translateX(3px);
         }
       `}</style>

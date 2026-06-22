@@ -1,313 +1,672 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Sparkles, Image, CheckCircle, ArrowRight } from 'lucide-react';
+import { 
+  Camera, ShieldCheck, Clock, Heart, BarChart3, 
+  Sparkles, ArrowRight, Check 
+} from 'lucide-react';
 
 const Landing = () => {
   const navigate = useNavigate();
 
+  const handlePortalClick = (role) => {
+    navigate(`/login?role=${role}`);
+  };
+
   return (
     <div className="landing-page-container">
-      {/* Header */}
+      {/* Navigation Header */}
       <header className="landing-header">
-        <div className="landing-logo">
-          <span className="logo-emoji">🏫</span>
-          <div>
-            <h1>FirstCry Intellitots</h1>
-            <p>PRESCHOOL PORTAL</p>
+        <div className="landing-logo-group" onClick={() => navigate('/')}>
+          <div className="fc-logo-badge">FC</div>
+          <div className="logo-text-wrapper">
+            <span className="logo-title">KidVista</span>
+            <span className="logo-sub">FIRSTCRY INTELLITOTS</span>
           </div>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate('/login')}>
-          Enter Portal <ArrowRight size={16} />
-        </button>
+        <nav className="nav-menu">
+          <a href="#features">Features</a>
+          <a href="#portals">For Schools</a>
+          <a href="#portals">Analytics</a>
+          <a href="#features">Privacy</a>
+        </nav>
+        <div className="nav-actions">
+          <span className="sign-in-link" onClick={() => navigate('/login')}>Sign in</span>
+          <button className="btn btn-primary btn-sm" onClick={() => navigate('/signup')}>
+            Get started
+          </button>
+        </div>
       </header>
 
       {/* Hero Section */}
       <section className="hero-section">
-        <div className="hero-text">
-          <h1>Daily Activity <br /><span>Photo Sharing</span> Portal</h1>
-          <p>
-            Welcome to our secure preschool media portal. We combine daily classroom learning updates with state-of-the-art privacy protection, letting you stay connected to your child's magical early learning milestones.
+        <div className="hero-content-left">
+          <div className="trusted-badge">
+            <span className="badge-icon">🏷️</span>
+            <span>Trusted by 600+ FirstCry Intellitots centres</span>
+          </div>
+          
+          <h1 className="hero-heading">
+            See every learning moment, <span className="text-blue">as it happens.</span>
+          </h1>
+          
+          <p className="hero-subtitle">
+            KidVista is the secure daily activity portal where teachers share photos, parents follow along, and admins keep it all safe — designed exclusively for preschool.
           </p>
+
           <div className="hero-ctas">
-            <button className="btn btn-primary btn-lg" onClick={() => navigate('/login')}>
-              Log In to Your Account
+            <button className="btn btn-primary btn-lg" onClick={() => navigate('/signup')}>
+              Start your school <ArrowRight size={16} style={{ marginLeft: '6px' }} />
             </button>
-            <a href="#features" className="btn btn-outline btn-lg">Explore Security Features</a>
+            <button className="btn btn-outline-gray btn-lg" onClick={() => handlePortalClick('parent')}>
+              View parent demo
+            </button>
+          </div>
+
+          <div className="hero-compliance-checks">
+            <div className="check-item">
+              <div className="check-circle-icon"><Check size={12} strokeWidth={3} /></div>
+              <span>Admin-approved logins</span>
+            </div>
+            <div className="check-item">
+              <div className="check-circle-icon"><Check size={12} strokeWidth={3} /></div>
+              <span>Tagged-only photo access</span>
+            </div>
+            <div className="check-item">
+              <div className="check-circle-icon"><Check size={12} strokeWidth={3} /></div>
+              <span>COPPA-aware</span>
+            </div>
           </div>
         </div>
-        <div className="hero-graphic">
-          <div className="graphic-blob">
-            <div className="bubble pink">🎨 Art</div>
-            <div className="bubble blue">🏃 Sports</div>
-            <div className="bubble green">📚 Stories</div>
-            <div className="bubble yellow">🎶 Music</div>
-            <span className="center-emoji">👶</span>
+
+        <div className="hero-content-right">
+          <div className="hero-image-wrapper">
+            <img 
+              src="/preschool_classroom.png" 
+              alt="Preschool kids coloring" 
+              className="hero-main-img" 
+            />
+            {/* Overlapping Floating Status Card */}
+            <div className="floating-status-card">
+              <div className="status-icon-circle">
+                <Camera size={18} color="#4F9CF9" />
+              </div>
+              <div className="status-text-details">
+                <h4>Art & Craft — Nursery</h4>
+                <p>12 new photos • Tagged 3 students</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
       <section id="features" className="features-section">
-        <h2 className="section-title">Why Parents Trust Our Portal</h2>
-        <p className="section-subtitle">Specially designed to keep our tiny learners safe, happy, and connected.</p>
+        <span className="section-pretitle">FEATURES</span>
+        <h2 className="section-title">Everything a preschool day needs.</h2>
         
         <div className="features-grid">
-          <div className="feature-item-card">
-            <div className="feat-icon pink">
-              <ShieldCheck size={28} />
+          <div className="feature-card">
+            <div className="feat-icon-wrapper">
+              <Camera size={20} color="#4F9CF9" />
             </div>
-            <h3>Secured Student Tagging</h3>
-            <p>Teachers tag students present in photos. Parents can only view photos where their own child is tagged. No student data leaks.</p>
+            <h3>Daily photo albums</h3>
+            <p>Teachers upload, AI suggests captions, and admin approves before parents see anything.</p>
           </div>
 
-          <div className="feature-item-card">
-            <div className="feat-icon blue">
-              <Sparkles size={28} />
+          <div className="feature-card">
+            <div className="feat-icon-wrapper">
+              <ShieldCheck size={20} color="#4F9CF9" />
             </div>
-            <h3>AI Captioning & Summaries</h3>
-            <p>Google Gemini AI generates beautiful preschool captions and details developmental benefits of daily classroom activities.</p>
+            <h3>Tagged-only access</h3>
+            <p>Parents only see photos where their child is tagged. Privacy is the default.</p>
           </div>
 
-          <div className="feature-item-card">
-            <div className="feat-icon green">
-              <Image size={28} />
+          <div className="feature-card">
+            <div className="feat-icon-wrapper">
+              <Clock size={20} color="#4F9CF9" />
             </div>
-            <h3>Classroom Memory Wall</h3>
-            <p>View your child's activities in a beautiful polaroid collage format. Download images to keep forever in your family album.</p>
+            <h3>Activity timeline</h3>
+            <p>From morning assembly to departure — every moment in a clean visual timeline.</p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feat-icon-wrapper">
+              <Heart size={20} color="#4F9CF9" />
+            </div>
+            <h3>Teacher notes</h3>
+            <p>Personal notes per child make every parent feel seen and informed.</p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feat-icon-wrapper">
+              <BarChart3 size={20} color="#4F9CF9" />
+            </div>
+            <h3>Live analytics</h3>
+            <p>Attendance, engagement and uploads update in real time on the admin dashboard.</p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feat-icon-wrapper">
+              <Sparkles size={20} color="#4F9CF9" />
+            </div>
+            <h3>AI summaries</h3>
+            <p>Daily class summaries written automatically. Teachers tweak and post.</p>
           </div>
         </div>
       </section>
 
-      {/* Trust & Privacy notice */}
-      <section className="trust-banner">
-        <div className="trust-inner">
-          <div className="trust-badge">🔒 ISO Compliant Privacy Security</div>
-          <h2>Absolute Student Privacy</h2>
-          <p>We believe in safe childhood memories. Other parents cannot view your child's photos, and photos are only published after administrative review and approval.</p>
+      {/* Portals Section */}
+      <section id="portals" className="portals-section">
+        <div className="portals-grid">
+          {/* Card 1: Parent Portal */}
+          <div className="portal-card">
+            <span className="portal-role-pre">FOR PARENTS</span>
+            <h3>Parent portal</h3>
+            <p>Follow your child's day in one beautiful feed.</p>
+            <span className="portal-link-btn" onClick={() => handlePortalClick('parent')}>
+              Open demo <ArrowRight size={14} style={{ marginLeft: '4px' }} />
+            </span>
+          </div>
+
+          {/* Card 2: Teacher Portal */}
+          <div className="portal-card">
+            <span className="portal-role-pre">FOR TEACHERS</span>
+            <h3>Teacher portal</h3>
+            <p>Upload, tag and share — in under a minute.</p>
+            <span className="portal-link-btn" onClick={() => handlePortalClick('teacher')}>
+              Open demo <ArrowRight size={14} style={{ marginLeft: '4px' }} />
+            </span>
+          </div>
+
+          {/* Card 3: Admin Portal */}
+          <div className="portal-card">
+            <span className="portal-role-pre">FOR ADMINS</span>
+            <h3>Admin portal</h3>
+            <p>Approvals, classrooms and live analytics.</p>
+            <span className="portal-link-btn" onClick={() => handlePortalClick('admin')}>
+              Open demo <ArrowRight size={14} style={{ marginLeft: '4px' }} />
+            </span>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="landing-footer">
-        <p>© 2026 FirstCry Intellitots Preschool. All Rights Reserved. Securing Childhood Memories with Love.</p>
-      </footer>
+      {/* Bottom CTA Banner */}
+      <section className="bottom-cta-section">
+        <h2 className="cta-heading">Built for the moments parents would otherwise miss.</h2>
+        <p className="cta-desc">Roll out KidVista across your centres in days. No app to install — just sign in and share.</p>
+        <div className="cta-buttons">
+          <button className="btn btn-primary" onClick={() => navigate('/signup')}>Create an account</button>
+          <button className="btn btn-outline-gray" onClick={() => navigate('/login')}>Sign in</button>
+        </div>
+      </section>
 
+      {/* Embedded CSS Styles */}
       <style>{`
         .landing-page-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 1.5rem;
+          background-color: #FFFFFF;
           font-family: 'Outfit', sans-serif;
+          color: #1F2937;
+          min-height: 100vh;
         }
 
+        /* Nav Header Styles */
         .landing-header {
+          max-width: 1200px;
+          margin: 0 auto;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 1.5rem 0;
-          border-bottom: 1px dashed rgba(0,0,0,0.08);
+          padding: 0.85rem 1.5rem;
+          background: #FFFFFF;
         }
 
-        .landing-logo {
+        .landing-logo-group {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          cursor: pointer;
+        }
+
+        .fc-logo-badge {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background-color: #4F9CF9;
+          color: #FFFFFF;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.85rem;
+        }
+
+        .logo-text-wrapper {
+          display: flex;
+          flex-direction: column;
+          line-height: 1.1;
+        }
+
+        .logo-title {
+          font-size: 1.3rem;
+          font-weight: 800;
+          color: #0F172A;
+          letter-spacing: -0.025em;
+        }
+
+        .logo-sub {
+          font-size: 0.55rem;
+          font-weight: 600;
+          color: #64748B;
+          letter-spacing: 0.05em;
+        }
+
+        .nav-menu {
+          display: flex;
+          gap: 2rem;
+        }
+
+        .nav-menu a {
+          text-decoration: none;
+          color: #64748B;
+          font-weight: 500;
+          font-size: 0.95rem;
+          transition: color 0.2s;
+        }
+
+        .nav-menu a:hover {
+          color: #0F172A;
+        }
+
+        .nav-actions {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+        }
+
+        .sign-in-link {
+          color: #64748B;
+          font-weight: 500;
+          cursor: pointer;
+          font-size: 0.95rem;
+          transition: color 0.2s;
+        }
+
+        .sign-in-link:hover {
+          color: #0F172A;
+        }
+
+        /* Buttons Styling */
+        .btn {
+          font-family: 'Outfit', sans-serif;
+          font-weight: 600;
+          border-radius: 9999px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .btn-primary {
+          background-color: #2563EB;
+          color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+          background-color: #1D4ED8;
+        }
+
+        .btn-outline-gray {
+          background-color: #FFFFFF;
+          color: #1F2937;
+          border: 1px solid #E5E7EB;
+        }
+
+        .btn-outline-gray:hover {
+          background-color: #F9FAFB;
+          border-color: #D1D5DB;
+        }
+
+        .btn-sm {
+          padding: 0.5rem 1rem;
+          font-size: 0.875rem;
+        }
+
+        .btn-lg {
+          padding: 0.75rem 1.5rem;
+          font-size: 1rem;
+        }
+
+        /* Hero Section */
+        .hero-section {
+          max-width: 1200px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 1.1fr 0.9fr;
+          gap: 3rem;
+          padding: 2.5rem 1.5rem 3rem;
+          align-items: center;
+          min-height: calc(100vh - 60px);
+        }
+
+        @media (max-width: 768px) {
+          .hero-section {
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+            padding: 2rem 1.5rem;
+          }
+        }
+
+        .hero-content-left {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .trusted-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          background-color: #F1F5F9;
+          padding: 0.3rem 0.7rem;
+          border-radius: 9999px;
+          align-self: flex-start;
+          margin-bottom: 1rem;
+        }
+
+        .trusted-badge span {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #475569;
+        }
+
+        .hero-heading {
+          font-size: 2.75rem;
+          font-weight: 800;
+          line-height: 1.15;
+          letter-spacing: -0.03em;
+          color: #0F172A;
+          margin-bottom: 1rem;
+        }
+
+        .text-blue {
+          color: #2563EB;
+        }
+
+        .hero-subtitle {
+          font-size: 1rem;
+          line-height: 1.6;
+          color: #475569;
+          margin-bottom: 1.5rem;
+        }
+
+        .hero-ctas {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 1.25rem;
+        }
+
+        .hero-compliance-checks {
+          display: flex;
+          gap: 2rem;
+        }
+
+        .check-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .check-circle-icon {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background-color: #E2E8F0;
+          color: #475569;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .check-item span {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: #475569;
+        }
+
+        /* Hero Image Layout */
+        .hero-content-right {
+          display: flex;
+          justify-content: center;
+        }
+
+        .hero-image-wrapper {
+          position: relative;
+          width: 100%;
+          max-width: 500px;
+        }
+
+        .hero-main-img {
+          width: 100%;
+          border-radius: 24px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+          display: block;
+        }
+
+        /* Overlapping Floating Status Card */
+        .floating-status-card {
+          position: absolute;
+          bottom: 1.5rem;
+          left: -1.5rem;
+          right: 1.5rem;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          border-radius: 16px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+          padding: 1rem 1.25rem;
           display: flex;
           align-items: center;
           gap: 0.75rem;
         }
-        
-        .logo-emoji {
-          font-size: 2.2rem;
+
+        @media (max-width: 480px) {
+          .floating-status-card {
+            left: 1rem;
+            right: 1rem;
+          }
         }
 
-        .landing-logo h1 {
-          font-size: 1.25rem;
-          font-weight: 800;
-          color: #FF6B8B;
-          line-height: 1;
-        }
-
-        .landing-logo p {
-          font-size: 0.7rem;
-          font-weight: 700;
-          color: #7F8C8D;
-          letter-spacing: 1.5px;
-        }
-
-        /* Hero styles */
-        .hero-ctas {
-          display: flex;
-          gap: 1rem;
-          margin-top: 1.5rem;
-        }
-
-        .btn-lg {
-          padding: 0.9rem 1.8rem;
-          font-size: 1.05rem;
-        }
-
-        .hero-graphic {
-          flex: 1;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 380px;
-        }
-
-        .graphic-blob {
-          width: 320px;
-          height: 320px;
+        .status-icon-circle {
+          width: 38px;
+          height: 38px;
           border-radius: 50%;
-          background: linear-gradient(135deg, rgba(255, 107, 139, 0.1), rgba(77, 150, 255, 0.1));
-          position: relative;
+          background-color: #EFF6FF;
           display: flex;
           align-items: center;
           justify-content: center;
-          animation: morph 6s ease-in-out infinite;
         }
 
-        .center-emoji {
-          font-size: 5rem;
-          animation: float 4s ease-in-out infinite;
-        }
-
-        .bubble {
-          position: absolute;
-          padding: 0.4rem 1rem;
-          border-radius: 50px;
+        .status-text-details h4 {
+          font-size: 0.95rem;
           font-weight: 700;
-          font-size: 0.85rem;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-          background: white;
-          animation: bounceBubble 3s ease-in-out infinite;
+          color: #0F172A;
+          margin: 0;
         }
 
-        .bubble.pink { top: 15%; left: -10%; border: 2px solid var(--color-pink); color: var(--color-pink); animation-delay: 0s; }
-        .bubble.blue { top: 60%; left: -15%; border: 2px solid var(--color-blue); color: var(--color-blue); animation-delay: 0.5s; }
-        .bubble.green { top: 10%; right: -10%; border: 2px solid var(--color-green); color: var(--color-green); animation-delay: 1s; }
-        .bubble.yellow { top: 65%; right: -15%; border: 2px solid var(--color-yellow); color: #B38600; animation-delay: 1.5s; }
+        .status-text-details p {
+          font-size: 0.75rem;
+          color: #64748B;
+          margin: 0;
+          margin-top: 0.15rem;
+        }
 
-        /* Features style */
+        /* Features Section */
         .features-section {
-          padding: 5rem 0;
-          text-align: center;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 4rem 1.5rem;
+          border-top: 1px solid #F1F5F9;
+        }
+
+        .section-pretitle {
+          font-size: 0.75rem;
+          font-weight: 800;
+          color: #2563EB;
+          letter-spacing: 0.1em;
+          display: block;
+          margin-bottom: 0.75rem;
         }
 
         .section-title {
-          font-size: 2.2rem;
+          font-size: 2rem;
           font-weight: 800;
-          color: #2C3E50;
-        }
-
-        .section-subtitle {
-          color: #7F8C8D;
-          font-size: 1.1rem;
-          margin-bottom: 3.5rem;
+          color: #0F172A;
+          letter-spacing: -0.025em;
+          margin-bottom: 2.5rem;
         }
 
         .features-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
           gap: 2.5rem;
         }
 
-        .feature-item-card {
-          background: white;
-          border-radius: 24px;
-          padding: 2.5rem 2rem;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-          border: 1px solid rgba(0,0,0,0.02);
-          transition: transform 0.3s;
+        .feature-card {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
         }
 
-        .feature-item-card:hover {
-          transform: translateY(-5px);
-        }
-
-        .feat-icon {
-          width: 65px;
-          height: 65px;
-          border-radius: 20px;
-          margin: 0 auto 1.5rem auto;
+        .feat-icon-wrapper {
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background-color: #EFF6FF;
           display: flex;
           align-items: center;
           justify-content: center;
+          margin-bottom: 1.25rem;
         }
 
-        .feat-icon.pink { background: rgba(255,107,139,0.1); color: var(--color-pink); }
-        .feat-icon.blue { background: rgba(77,150,255,0.1); color: var(--color-blue); }
-        .feat-icon.green { background: rgba(107,203,119,0.1); color: var(--color-green); }
-
-        .feature-item-card h3 {
-          font-size: 1.25rem;
+        .feature-card h3 {
+          font-size: 1.15rem;
           font-weight: 700;
-          margin-bottom: 0.75rem;
-          color: #2C3E50;
+          color: #0F172A;
+          margin-bottom: 0.5rem;
         }
 
-        .feature-item-card p {
-          color: #7F8C8D;
-          font-size: 0.92rem;
-          line-height: 1.6;
+        .feature-card p {
+          font-size: 0.95rem;
+          line-height: 1.5;
+          color: #475569;
         }
 
-        /* Trust banner */
-        .trust-banner {
-          background: linear-gradient(135deg, var(--color-pink), var(--color-purple));
-          border-radius: var(--border-radius-lg);
-          color: white;
-          padding: 4rem 2rem;
-          text-align: center;
-          margin-bottom: 5rem;
-          box-shadow: 0 15px 35px rgba(255,107,139,0.15);
-        }
-
-        .trust-inner {
-          max-width: 700px;
+        /* Portals Section */
+        .portals-section {
+          max-width: 1200px;
           margin: 0 auto;
+          padding: 2rem 1.5rem 4rem 1.5rem;
         }
 
-        .trust-badge {
-          background: rgba(255,255,255,0.2);
-          padding: 0.3rem 0.75rem;
-          border-radius: 50px;
-          font-size: 0.75rem;
+        .portals-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+          .portals-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+        }
+
+        .portal-card {
+          background-color: #F8FAFC;
+          border-radius: 16px;
+          padding: 2.5rem 2rem;
+          border: 1px solid #F1F5F9;
+          display: flex;
+          flex-direction: column;
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .portal-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+        }
+
+        .portal-role-pre {
+          font-size: 0.7rem;
           font-weight: 700;
-          display: inline-block;
-          margin-bottom: 1rem;
-          text-transform: uppercase;
+          color: #64748B;
+          letter-spacing: 0.075em;
+          margin-bottom: 0.5rem;
         }
 
-        .trust-banner h2 {
-          font-size: 2.2rem;
+        .portal-card h3 {
+          font-size: 1.35rem;
           font-weight: 800;
-          margin-bottom: 1rem;
+          color: #0F172A;
+          margin-bottom: 0.5rem;
         }
 
-        .trust-banner p {
-          font-size: 1.05rem;
-          line-height: 1.6;
-          opacity: 0.9;
+        .portal-card p {
+          font-size: 0.95rem;
+          color: #475569;
+          line-height: 1.5;
+          margin-bottom: 2rem;
+          flex-grow: 1;
         }
 
-        .landing-footer {
+        .portal-link-btn {
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #2563EB;
+          display: inline-flex;
+          align-items: center;
+          cursor: pointer;
+          transition: gap 0.2s;
+        }
+
+        .portal-link-btn:hover {
+          color: #1D4ED8;
+          text-decoration: underline;
+        }
+
+        /* Bottom CTA Section */
+        .bottom-cta-section {
+          background-color: #F8FAFC;
+          border-top: 1px solid #E2E8F0;
+          padding: 4rem 1.5rem;
           text-align: center;
-          padding: 2.5rem 0;
-          color: #7F8C8D;
-          font-size: 0.85rem;
-          border-top: 1px solid rgba(0,0,0,0.05);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
         }
 
-        /* Animations */
-        @keyframes morph {
-          0%, 100% { border-radius: 50%; }
-          50% { border-radius: 40% 60% 60% 40% / 50% 40% 60% 50%; }
+        .cta-heading {
+          font-size: 2.15rem;
+          font-weight: 800;
+          line-height: 1.2;
+          color: #0F172A;
+          max-width: 600px;
+          margin-bottom: 1rem;
+          letter-spacing: -0.02em;
         }
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
+
+        .cta-desc {
+          font-size: 1.05rem;
+          color: #475569;
+          margin-bottom: 2.5rem;
+          max-width: 500px;
         }
-        @keyframes bounceBubble {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
+
+        .cta-buttons {
+          display: flex;
+          gap: 1rem;
         }
       `}</style>
     </div>

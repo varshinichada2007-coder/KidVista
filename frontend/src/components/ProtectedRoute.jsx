@@ -16,11 +16,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
       }}>
         <div style={{
           textAlign: 'center',
-          color: '#FF6B8B',
+          color: 'var(--color-primary)',
           fontSize: '1.2rem',
           fontWeight: 'bold'
         }}>
-          <p>🏫 Loading Intellitots Portal...</p>
+          <p>🏫 Loading KidVista Portal...</p>
         </div>
       </div>
     );
@@ -44,7 +44,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
         margin: '5rem auto',
         boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
       }}>
-        <h2 style={{ color: '#FF6B8B', marginBottom: '1rem' }}>⛔ Access Denied</h2>
+        <h2 style={{ color: 'var(--color-primary)', marginBottom: '1rem' }}>⛔ Access Denied</h2>
         <p style={{ color: '#7F8C8D', marginBottom: '1.5rem' }}>You do not have permission to view this page.</p>
         <Navigate to="/" replace />
       </div>

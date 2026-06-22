@@ -1,17 +1,23 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { Lock, Mail, Key, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, ShieldCheck, ArrowLeft, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import API from '../../services/api';
 
 const Login = () => {
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  // Selected role can be null, 'parent', 'teacher', 'admin'
+  const [selectedRole, setSelectedRole] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [adminSecret, setAdminSecret] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // States for resetting Admin Password
+  // Modal stats for reset admin
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetSecret, setResetSecret] = useState('');
@@ -20,36 +26,27 @@ const Login = () => {
   const [resetSuccess, setResetSuccess] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
 
-  const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  const isAdminEmail = email.trim().toLowerCase() === 'akhilkumarchada86@gmail.com';
+  // Clear inputs when role is changed
+  useEffect(() => {
+    setEmail('');
+    setPassword('');
+    setAdminSecret('');
+    setError('');
+  }, [selectedRole]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!email || !password) {
-      setError('Please fill in email and password.');
-      return;
-    }
-
-    if (isAdminEmail && !adminSecret) {
-      setError('Admin secret code is required.');
-      return;
-    }
-
     setError('');
     setLoading(true);
 
     try {
       const userObj = await login(email, password, adminSecret);
-
       if (userObj.role === 'admin') navigate('/admin');
       else if (userObj.role === 'teacher') navigate('/teacher');
       else if (userObj.role === 'parent') navigate('/parent');
       else navigate('/');
     } catch (err) {
-      setError(err || 'Login failed.');
+      setError(err || 'Authentication failed. Please verify credentials.');
     } finally {
       setLoading(false);
     }
@@ -57,10 +54,6 @@ const Login = () => {
 
   const handleResetSubmit = async (e) => {
     e.preventDefault();
-    if (!resetEmail || !resetSecret || !resetNewPassword) {
-      setResetError('All fields are required.');
-      return;
-    }
     setResetError('');
     setResetSuccess('');
     setResetLoading(true);
@@ -73,7 +66,6 @@ const Login = () => {
       setResetSuccess(response.data.message);
       setTimeout(() => {
         setShowResetModal(false);
-        // Clear fields
         setResetEmail('');
         setResetSecret('');
         setResetNewPassword('');
@@ -86,227 +78,238 @@ const Login = () => {
     }
   };
 
-  const fillDemoCredentials = (demoEmail, demoPass) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setAdminSecret('');
-    setError('');
-  };
-
   return (
-    <div className="login-wrapper">
-      <div className="login-card">
-        <div className="login-header">
-          <span className="school-logo-lrg">🏫</span>
-          <h2>Intellitots Portal</h2>
-          <p>Login to view classroom updates</p>
+    <div className="login-split-container">
+      {/* Left side brand banner pane */}
+      <div className="login-left-pane">
+        <span className="back-link" onClick={() => navigate('/')}>
+          <ArrowLeft size={16} /> Back to home
+        </span>
+        
+        <div className="left-pane-brand">
+          <div className="brand-logo-circle">
+            📸
+          </div>
+          <h2>KidVista</h2>
         </div>
 
-        {error && (
-          <div className="error-alert">
-            <AlertCircle size={18} />
-            <span>{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label>Email Address</label>
-            <div className="input-with-icon">
-              <Mail size={18} className="input-icon" />
-              <input
-                type="email"
-                className="form-control"
-                placeholder="parent1@firstcry.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label style={{ marginBottom: 0 }}>Password</label>
-              <button
-                type="button"
-                onClick={() => setShowResetModal(true)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#FF6B8B',
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  padding: 0
-                }}
-              >
-                Forgot Password?
-              </button>
-            </div>
-            <div className="input-with-icon" style={{ marginTop: '0.35rem' }}>
-              <Lock size={18} className="input-icon" />
-              <input
-                type="password"
-                className="form-control"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          {isAdminEmail && (
-            <div className="form-group">
-              <label>Admin Secret Code</label>
-              <div className="input-with-icon">
-                <ShieldCheck size={18} className="input-icon" />
-                <input
-                  type="password"
-                  className="form-control"
-                  placeholder="Enter admin secret code"
-                  value={adminSecret}
-                  onChange={(e) => setAdminSecret(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-          )}
-
-          <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-            {loading ? 'Authenticating...' : 'Sign In'}
-          </button>
-        </form>
-
-        <p className="signup-text">
-          Don&apos;t have an account? <Link to="/signup">Create Account</Link>
-        </p>
-
-        <div className="demo-credentials-section">
-          <div className="demo-header-title">
-            <Key size={14} />
-            <span>Demo Accounts</span>
-          </div>
-
-          <div className="demo-badges-container" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
-            <button
-              className="demo-btn teacher"
-              onClick={() => fillDemoCredentials('teacher@firstcry.com', 'teacher123')}
-            >
-              👩‍🏫 Teacher
-            </button>
-
-            <button
-              className="demo-btn parent"
-              onClick={() => fillDemoCredentials('Rajesh@firstcry.com', 'Rajesh@123')}
-            >
-              👨‍👩‍👦 Parent
-            </button>
-          </div>
-
-          <p className="admin-note">
-            Admin credentials are secure and must be typed manually.
+        <div className="left-pane-main">
+          <span className="left-role-avatar">
+            {selectedRole === 'teacher' ? '👩‍🏫' : selectedRole === 'admin' ? '👨‍💼' : '👨‍👩‍👧'}
+          </span>
+          <h1>
+            Welcome back, <br />
+            {selectedRole ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1) : 'Friend'}
+          </h1>
+          <p>
+            {selectedRole === 'teacher' 
+              ? 'Upload daily activities, tag children in photos, and communicate learning outcomes.'
+              : selectedRole === 'admin'
+              ? 'Moderate photos, manage registrations, review attendance, and view analytics.'
+              : "View your child's daily journey, photos, milestones, and daycare updates."}
           </p>
+        </div>
+
+        <div className="left-pane-footer">
+          <div className="encryption-pill">
+            🛡️ Your account is protected with end-to-end encryption and COPPA compliance.
+          </div>
+
+          <div className="trust-families-row">
+            <div className="avatar-group">
+              <span className="avatar-group-item bg-pink">A</span>
+              <span className="avatar-group-item bg-blue">S</span>
+              <span className="avatar-group-item bg-green">R</span>
+            </div>
+            <span>50,000+ families trust KidVista</span>
+          </div>
         </div>
       </div>
 
-      {showResetModal && (
-        <div className="modal-backdrop" style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          background: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 1000,
-          fontFamily: 'Outfit, sans-serif'
-        }}>
-          <div className="glass-panel" style={{
-            background: 'white',
-            padding: '2rem',
-            borderRadius: '16px',
-            width: '100%',
-            maxWidth: '400px',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
-            boxSizing: 'border-box'
-          }}>
-            <h3 style={{ marginBottom: '1rem', color: '#2C3E50', fontSize: '1.25rem', fontWeight: 800 }}>Reset Admin Password</h3>
+      {/* Right side interactive forms pane */}
+      <div className="login-right-pane">
+        {!selectedRole ? (
+          /* Role Selector Page */
+          <div className="role-router-card">
+            <h2>Sign in to KidVista</h2>
+            <p className="router-sub">Choose your role to continue</p>
             
-            {resetError && (
-              <div className="error-alert" style={{ marginBottom: '1rem', padding: '0.5rem', fontSize: '0.85rem' }}>
-                {resetError}
+            <div className="role-options-list">
+              <div className="role-option" onClick={() => setSelectedRole('parent')}>
+                <span className="role-icon font-pink">👪</span>
+                <div className="role-details">
+                  <h4>Parent</h4>
+                  <p>View your child's daily journey, photos, and activities</p>
+                </div>
+                <ArrowRight size={18} className="role-arrow" />
               </div>
-            )}
-            {resetSuccess && (
-              <div className="success-alert" style={{ marginBottom: '1rem', padding: '0.5rem', fontSize: '0.85rem' }}>
-                {resetSuccess}
-              </div>
-            )}
 
+              <div className="role-option" onClick={() => setSelectedRole('teacher')}>
+                <span className="role-icon font-green">👩‍🏫</span>
+                <div className="role-details">
+                  <h4>Teacher</h4>
+                  <p>Upload activities, tag students, and engage with families</p>
+                </div>
+                <ArrowRight size={18} className="role-arrow" />
+              </div>
+
+              <div className="role-option" onClick={() => setSelectedRole('admin')}>
+                <span className="role-icon font-blue">🏫</span>
+                <div className="role-details">
+                  <h4>Administrator</h4>
+                  <p>Manage school operations, users, and analytics</p>
+                </div>
+                <ArrowRight size={18} className="role-arrow" />
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Credentials entry form page */
+          <div className="credentials-form-card">
+            <span className="change-role-btn" onClick={() => setSelectedRole(null)}>
+              <ArrowLeft size={14} /> Change role
+            </span>
+
+            <h2 className="form-title">
+              {selectedRole === 'admin' ? 'Administrator' : selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)} Login
+            </h2>
+            <p className="form-subtitle">Secure, private access to KidVista</p>
+
+            {error && <div className="error-badge-msg">{error}</div>}
+
+            <form onSubmit={handleSubmit} className="login-form-widget">
+              <div className="form-group-item">
+                <label>Email Address</label>
+                <div className="input-icon-box">
+                  <Mail size={16} className="inp-icon" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={`e.g. ${selectedRole}@kidvista.com`}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group-item">
+                <div className="label-row-forgot">
+                  <label>Password</label>
+                  {selectedRole === 'admin' && (
+                    <span className="forgot-lnk" onClick={() => setShowResetModal(true)}>
+                      Forgot password?
+                    </span>
+                  )}
+                </div>
+                <div className="input-icon-box">
+                  <Lock size={16} className="inp-icon" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                  />
+                  <span className="pass-toggle" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </span>
+                </div>
+              </div>
+
+              {selectedRole === 'admin' && (
+                <div className="form-group-item">
+                  <label>Admin Secret Code</label>
+                  <div className="input-icon-box">
+                    <ShieldCheck size={16} className="inp-icon" />
+                    <input
+                      type="password"
+                      value={adminSecret}
+                      onChange={(e) => setAdminSecret(e.target.value)}
+                      placeholder="Enter secret code"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="remember-row">
+                <label className="checkbox-wrap">
+                  <input type="checkbox" defaultChecked />
+                  <span className="checkbox-lbl">Remember me</span>
+                </label>
+              </div>
+
+              <button type="submit" className="btn btn-primary form-submit-btn" disabled={loading}>
+                {loading ? 'Authenticating...' : `Sign In as ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}
+              </button>
+            </form>
+
+            <div className="demo-fill-card" onClick={handleSubmit}>
+              <span className="fill-icon">🔑</span>
+              <div>
+                <strong>Demo credentials pre-filled</strong>
+                <p>Click Sign In to explore</p>
+              </div>
+            </div>
+
+            <div className="secure-login-notice">
+              <Lock size={14} color="var(--color-primary)" />
+              <div>
+                <strong>Secure Login</strong>
+                <p>KidVista uses end-to-end encryption. Your child's data is never shared or sold. COPPA & GDPR compliant.</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Reset password Modal */}
+      {showResetModal && (
+        <div className="modal-backdrop">
+          <div className="reset-modal-panel">
+            <h3>Reset Admin Password</h3>
+            {resetError && <div className="error-badge-msg">{resetError}</div>}
+            {resetSuccess && <div className="success-badge-msg">{resetSuccess}</div>}
+            
             <form onSubmit={handleResetSubmit}>
-              <div className="form-group" style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontWeight: 700, marginBottom: '0.3rem', fontSize: '0.9rem' }}>Admin Email</label>
+              <div className="form-group-item" style={{ marginBottom: '1rem' }}>
+                <label>Admin Email</label>
                 <input
                   type="email"
-                  className="form-control"
-                  placeholder="akhilkumarchada86@gmail.com"
+                  className="modal-inp"
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
-                  style={{ boxSizing: 'border-box' }}
+                  placeholder="akhilkumarchada86@gmail.com"
                   required
                 />
               </div>
-
-              <div className="form-group" style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontWeight: 700, marginBottom: '0.3rem', fontSize: '0.9rem' }}>Admin Secret Code</label>
+              <div className="form-group-item" style={{ marginBottom: '1rem' }}>
+                <label>Admin Secret Code</label>
                 <input
                   type="password"
-                  className="form-control"
-                  placeholder="Enter secret code"
+                  className="modal-inp"
                   value={resetSecret}
                   onChange={(e) => setResetSecret(e.target.value)}
-                  style={{ boxSizing: 'border-box' }}
+                  placeholder="Enter secret code"
                   required
                 />
               </div>
-
-              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', fontWeight: 700, marginBottom: '0.3rem', fontSize: '0.9rem' }}>New Password</label>
+              <div className="form-group-item" style={{ marginBottom: '1.5rem' }}>
+                <label>New Password</label>
                 <input
                   type="password"
-                  className="form-control"
-                  placeholder="Enter new password"
+                  className="modal-inp"
                   value={resetNewPassword}
                   onChange={(e) => setResetNewPassword(e.target.value)}
-                  style={{ boxSizing: 'border-box' }}
+                  placeholder="Enter new password"
                   required
                 />
               </div>
-
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={() => {
-                    setShowResetModal(false);
-                    setResetError('');
-                    setResetSuccess('');
-                  }}
-                  disabled={resetLoading}
-                  style={{ background: 'none', border: '1px solid #ccc', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
-                >
+              <div className="modal-actions">
+                <button type="button" className="btn btn-outline" onClick={() => setShowResetModal(false)}>
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={resetLoading}
-                  style={{ background: '#FF6B8B', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
-                >
+                <button type="submit" className="btn btn-primary" disabled={resetLoading}>
                   {resetLoading ? 'Resetting...' : 'Reset Password'}
                 </button>
               </div>
@@ -316,167 +319,488 @@ const Login = () => {
       )}
 
       <style>{`
-        .login-wrapper {
-          min-height: 90vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 2rem;
+        .login-split-container {
+          display: grid;
+          grid-template-columns: 1.1fr 1fr;
+          min-height: 100vh;
           font-family: 'Outfit', sans-serif;
+          background-color: #ffffff;
         }
 
-        .login-card {
-          width: 100%;
-          max-width: 450px;
-          padding: 2.5rem;
-          border-radius: 18px;
-          background: white;
-          box-shadow: 0 20px 45px rgba(255, 107, 139, 0.12);
-        }
-
-        .login-header {
-          text-align: center;
-          margin-bottom: 2rem;
-        }
-
-        .school-logo-lrg {
-          font-size: 3rem;
-          display: block;
-          margin-bottom: 0.5rem;
-        }
-
-        .login-header h2 {
-          font-size: 1.6rem;
-          font-weight: 800;
-          color: #2C3E50;
-        }
-
-        .login-header p {
-          font-size: 0.9rem;
-          color: #777;
-        }
-
-        .form-group {
-          margin-bottom: 1rem;
-        }
-
-        .form-group label {
-          display: block;
-          margin-bottom: 0.35rem;
-          font-weight: 700;
-          color: #2C3E50;
-          font-size: 0.9rem;
-        }
-
-        .input-with-icon {
+        .login-left-pane {
+          background: linear-gradient(135deg, var(--color-primary), var(--color-purple));
+          color: #ffffff;
+          padding: 3.5rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
           position: relative;
         }
 
-        .input-with-icon input {
-          padding-left: 2.5rem;
-        }
-
-        .input-icon {
+        .back-link {
           position: absolute;
-          left: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #777;
+          top: 2rem;
+          left: 3.5rem;
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: rgba(255,255,255,0.8);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          transition: var(--transition-smooth);
         }
 
-        .form-control {
-          width: 100%;
-          padding: 0.75rem;
-          border: 1px solid #ddd;
-          border-radius: 10px;
-          font-size: 0.95rem;
+        .back-link:hover {
+          color: #ffffff;
         }
 
-        .btn-block {
-          width: 100%;
+        .left-pane-brand {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
           margin-top: 1rem;
         }
 
-        .btn {
-          border: none;
-          border-radius: 10px;
-          padding: 0.8rem;
-          font-weight: 800;
-          cursor: pointer;
-        }
-
-        .btn-primary {
-          background: #FF6B8B;
-          color: white;
-        }
-
-        .error-alert {
-          background: #FFF0F2;
-          border: 1px solid rgba(255,107,139,0.3);
-          border-radius: 10px;
-          color: #FF6B8B;
-          padding: 0.75rem 1rem;
-          margin-bottom: 1.5rem;
+        .brand-logo-circle {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          background: rgba(255,255,255,0.2);
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          justify-content: center;
+          font-size: 1.1rem;
+        }
+
+        .left-pane-brand h2 {
+          font-size: 1.25rem;
+          font-weight: 800;
+          letter-spacing: 0.5px;
+        }
+
+        .left-pane-main {
+          max-width: 420px;
+          text-align: left;
+        }
+
+        .left-role-avatar {
+          font-size: 4rem;
+          display: block;
+          margin-bottom: 1rem;
+          animation: float 4s ease-in-out infinite;
+        }
+
+        .left-pane-main h1 {
+          font-size: 2.8rem;
+          font-weight: 800;
+          line-height: 1.15;
+          margin-bottom: 1rem;
+        }
+
+        .left-pane-main p {
+          font-size: 1.05rem;
+          opacity: 0.85;
+          line-height: 1.6;
+        }
+
+        .left-pane-footer {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .encryption-pill {
+          background: rgba(255,255,255,0.12);
+          padding: 0.75rem 1.25rem;
+          border-radius: 12px;
+          font-size: 0.82rem;
+          line-height: 1.4;
+          font-weight: 600;
+          text-align: left;
+        }
+
+        .trust-families-row {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
           font-size: 0.88rem;
           font-weight: 600;
         }
 
-        .signup-text {
-          text-align: center;
-          margin-top: 1rem;
-          font-size: 0.9rem;
+        .avatar-group {
+          display: flex;
         }
 
-        .signup-text a {
-          color: #FF6B8B;
-          font-weight: 800;
-          text-decoration: none;
-        }
-
-        .demo-credentials-section {
-          margin-top: 1.5rem;
-          border-top: 1px dashed rgba(0,0,0,0.08);
-          padding-top: 1.5rem;
-        }
-
-        .demo-header-title {
-          font-size: 0.8rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          color: #777;
+        .avatar-group-item {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          border: 2px solid var(--color-primary);
           display: flex;
           align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 800;
+          font-size: 0.7rem;
+          margin-right: -8px;
+        }
+
+        .avatar-group-item.bg-pink { background: var(--color-pink); }
+        .avatar-group-item.bg-blue { background: var(--color-blue); border-color: var(--color-purple); }
+        .avatar-group-item.bg-green { background: var(--color-green); }
+
+        /* Right pane selector */
+        .login-right-pane {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 3.5rem;
+          background: #F8FAFC;
+        }
+
+        .role-router-card, .credentials-form-card {
+          width: 100%;
+          max-width: 420px;
+          text-align: left;
+        }
+
+        .role-router-card h2, .credentials-form-card h2 {
+          font-size: 1.8rem;
+          font-weight: 800;
+          color: var(--text-dark);
+          margin-bottom: 0.25rem;
+        }
+
+        .router-sub {
+          font-size: 0.95rem;
+          color: var(--text-muted);
+          margin-bottom: 2rem;
+        }
+
+        .role-options-list {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .role-option {
+          background: #ffffff;
+          border: 1px solid rgba(0,0,0,0.04);
+          border-radius: 16px;
+          padding: 1.25rem;
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
+          cursor: pointer;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.01);
+          transition: var(--transition-smooth);
+        }
+
+        .role-option:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px rgba(79, 156, 249, 0.08);
+          border-color: rgba(79, 156, 249, 0.2);
+        }
+
+        .role-icon {
+          width: 50px;
+          height: 50px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.8rem;
+          flex-shrink: 0;
+        }
+
+        .role-icon.font-pink { background: #E3F2FD; }
+        .role-icon.font-green { background: #E8F8EE; }
+        .role-icon.font-blue { background: #E8F2FE; }
+
+        .role-details h4 {
+          font-size: 1rem;
+          font-weight: 800;
+          color: var(--text-dark);
+          margin: 0;
+        }
+
+        .role-details p {
+          font-size: 0.82rem;
+          color: var(--text-muted);
+          margin-top: 0.15rem;
+          line-height: 1.4;
+        }
+
+        .role-arrow {
+          margin-left: auto;
+          color: #CBD5E1;
+          transition: var(--transition-smooth);
+        }
+
+        .role-option:hover .role-arrow {
+          color: var(--color-primary);
+          transform: translateX(3px);
+        }
+
+        /* Credentials form */
+        .change-role-btn {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: var(--color-primary);
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
           gap: 0.3rem;
-          margin-bottom: 0.75rem;
+          margin-bottom: 1.5rem;
+          transition: var(--transition-smooth);
         }
 
-        .demo-badges-container {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 0.5rem;
+        .change-role-btn:hover {
+          color: var(--color-primary-hover);
         }
 
-        .demo-btn {
-          border: none;
-          padding: 0.6rem 0.2rem;
-          border-radius: 8px;
+        .form-subtitle {
+          font-size: 0.95rem;
+          color: var(--text-muted);
+          margin-bottom: 1.5rem;
+        }
+
+        .login-form-widget {
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+        }
+
+        .form-group-item {
+          display: flex;
+          flex-direction: column;
+          gap: 0.35rem;
+        }
+
+        .form-group-item label {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: var(--text-dark);
+        }
+
+        .label-row-forgot {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .forgot-lnk {
           font-size: 0.8rem;
           font-weight: 700;
+          color: var(--color-primary);
           cursor: pointer;
         }
 
-        .demo-btn.admin { background: #FFE8EC; color: #FF6B8B; }
-        .demo-btn.teacher { background: #E8F5E9; color: #2E7D32; }
-        .demo-btn.parent { background: #E3F2FD; color: #1565C0; }
+        .input-icon-box {
+          position: relative;
+        }
 
-        .admin-note {
-          margin-top: 0.7rem;
+        .inp-icon {
+          position: absolute;
+          left: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #94A3B8;
+        }
+
+        .input-icon-box input {
+          width: 100%;
+          padding: 0.8rem 1rem 0.8rem 2.75rem;
+          font-size: 0.92rem;
+          border-radius: 12px;
+          border: 1px solid #E2E8F0;
+          background: #ffffff;
+          outline: none;
+          font-family: inherit;
+          transition: var(--transition-smooth);
+        }
+
+        .input-icon-box input:focus {
+          border-color: var(--color-primary);
+          box-shadow: 0 0 0 3px rgba(79, 156, 249, 0.12);
+        }
+
+        .pass-toggle {
+          position: absolute;
+          right: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #94A3B8;
+          cursor: pointer;
+        }
+
+        .remember-row {
+          margin-top: 0.25rem;
+        }
+
+        .checkbox-wrap {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          cursor: pointer;
+        }
+
+        .checkbox-lbl {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--text-muted);
+        }
+
+        .form-submit-btn {
+          width: 100%;
+          border-radius: 12px;
+          padding: 0.85rem;
+          font-weight: 700;
+          margin-top: 0.5rem;
+        }
+
+        .error-badge-msg {
+          background: #E3F2FD;
+          color: #4F9CF9;
+          border-radius: 10px;
+          padding: 0.6rem 1rem;
+          font-size: 0.82rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          border-left: 4px solid #4F9CF9;
+        }
+
+        .success-badge-msg {
+          background: #E8F8EE;
+          color: var(--color-success);
+          border-radius: 10px;
+          padding: 0.6rem 1rem;
+          font-size: 0.82rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          border-left: 4px solid var(--color-success);
+        }
+
+        /* Demo badge click indicator */
+        .demo-fill-card {
+          margin-top: 1.5rem;
+          background: #F1F5F9;
+          border: 1px dashed #CBD5E1;
+          border-radius: 12px;
+          padding: 0.85rem 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.85rem;
+          cursor: pointer;
+          transition: var(--transition-smooth);
+        }
+
+        .demo-fill-card:hover {
+          background: #E2E8F0;
+          transform: translateY(-1px);
+        }
+
+        .fill-icon {
+          font-size: 1.5rem;
+        }
+
+        .demo-fill-card strong {
+          display: block;
+          font-size: 0.85rem;
+          color: var(--text-dark);
+        }
+
+        .demo-fill-card p {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          margin: 0;
+        }
+
+        .secure-login-notice {
+          margin-top: 1.5rem;
+          background: #E8F2FE;
+          border-radius: 12px;
+          padding: 0.85rem 1rem;
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
           font-size: 0.78rem;
-          color: #888;
-          text-align: center;
+          line-height: 1.4;
+        }
+
+        .secure-login-notice strong {
+          color: var(--color-primary);
+          display: block;
+          margin-bottom: 0.1rem;
+        }
+
+        .secure-login-notice p {
+          margin: 0;
+          color: #475569;
+        }
+
+        /* Modal styling */
+        .modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(15, 23, 42, 0.4);
+          backdrop-filter: blur(2px);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          zIndex: 1000;
+        }
+
+        .reset-modal-panel {
+          background: #ffffff;
+          padding: 2.25rem;
+          border-radius: 18px;
+          width: 90%;
+          max-width: 400px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .reset-modal-panel h3 {
+          font-size: 1.2rem;
+          font-weight: 800;
+          color: var(--text-dark);
+          margin-bottom: 1.25rem;
+        }
+
+        .modal-inp {
+          width: 100%;
+          padding: 0.75rem;
+          border-radius: 8px;
+          border: 1px solid #E2E8F0;
+          outline: none;
+        }
+
+        .modal-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 0.5rem;
+          margin-top: 1.5rem;
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+
+        @media (max-width: 850px) {
+          .login-split-container {
+            grid-template-columns: 1fr;
+          }
+          .login-left-pane {
+            display: none;
+          }
+          .login-right-pane {
+            padding: 2.5rem 1.5rem;
+          }
         }
       `}</style>
     </div>

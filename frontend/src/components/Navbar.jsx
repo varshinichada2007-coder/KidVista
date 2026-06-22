@@ -1,66 +1,77 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { LogOut, User, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Bell, Search } from 'lucide-react';
 
-const Navbar = ({ title = "Preschool Portal" }) => {
+const Navbar = ({ title = "Admin Portal" }) => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const getRoleBadgeClass = (role) => {
+  const getInitials = (name) => {
+    if (!name) return 'AD';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  const getRoleLabel = (role) => {
     switch (role) {
-      case 'admin': return 'role-badge admin';
-      case 'teacher': return 'role-badge teacher';
-      case 'parent': return 'role-badge parent';
-      default: return 'role-badge';
+      case 'admin': return 'Centre administrator';
+      case 'teacher': return 'Class teacher';
+      case 'parent': return 'Parent';
+      default: return role;
     }
   };
 
   return (
-    <nav className="nav-header">
-      <div className="nav-logo-group" onClick={() => navigate('/')}>
-        <Sparkles className="logo-sparkle-icon" />
-        <span className="nav-logo-title">Intellitots</span>
+    <nav className="top-navbar">
+      {/* Search Bar */}
+      <div className="navbar-search">
+        <Search size={15} className="search-icon" />
+        <input
+          type="text"
+          placeholder="Search students, photos, activities..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
       </div>
 
-      <div className="nav-page-title">{title}</div>
+      {/* Right side */}
+      <div className="navbar-right">
+        {/* Admin Portal badge */}
+        <button className="admin-portal-badge" onClick={() => navigate('/admin')}>
+          Admin Portal
+        </button>
 
-      <div className="nav-user-actions">
-        {user ? (
-          <>
-            <div className="nav-user-profile">
-              <div className="profile-avatar">
-                <User size={18} />
-              </div>
-              <div className="profile-info-text">
-                <span className="profile-username">{user.name}</span>
-                <span className={getRoleBadgeClass(user.role)}>{user.role}</span>
-              </div>
+        {/* Notification bell */}
+        <button className="navbar-bell-btn">
+          <Bell size={18} />
+        </button>
+
+        {/* User Info */}
+        {user && (
+          <div className="navbar-user-info" onClick={handleLogout} title="Click to logout" style={{ cursor: 'pointer' }}>
+            <div className="navbar-avatar">
+              {getInitials(user.name)}
             </div>
-            <button className="nav-logout-btn" onClick={handleLogout} title="Log Out">
-              <LogOut size={18} />
-              <span className="logout-text">Logout</span>
-            </button>
-          </>
-        ) : (
-          <button className="nav-login-redirect-btn" onClick={() => navigate('/login')}>
-            Log In
-          </button>
+            <div className="navbar-user-text">
+              <span className="navbar-user-name">{user.name || 'Admin'}</span>
+              <span className="navbar-user-role">{getRoleLabel(user.role)}</span>
+            </div>
+          </div>
         )}
       </div>
 
       <style>{`
-        .nav-header {
-          height: 70px;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        .top-navbar {
+          height: 64px;
+          background: #ffffff;
+          border-bottom: 1px solid #F1F5F9;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -68,126 +79,134 @@ const Navbar = ({ title = "Preschool Portal" }) => {
           position: sticky;
           top: 0;
           z-index: 100;
-          box-shadow: 0 2px 15px rgba(0,0,0,0.02);
+          gap: 1.5rem;
           font-family: 'Outfit', sans-serif;
         }
-        .nav-logo-group {
+
+        .navbar-search {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          cursor: pointer;
+          background: #F8FAFC;
+          border: 1px solid #E2E8F0;
+          border-radius: 8px;
+          padding: 0.5rem 0.9rem;
+          min-width: 280px;
+          max-width: 380px;
+          flex: 1;
         }
-        .logo-sparkle-icon {
-          color: #FF6B8B;
-          fill: rgba(255, 107, 139, 0.2);
-          animation: float 3s ease-in-out infinite;
+
+        .search-icon {
+          color: #94A3B8;
+          flex-shrink: 0;
         }
-        .nav-logo-title {
-          font-size: 1.3rem;
-          font-weight: 800;
-          background: linear-gradient(135deg, #FF6B8B, #4D96FF);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+
+        .search-input {
+          border: none;
+          background: transparent;
+          outline: none;
+          font-size: 0.875rem;
+          color: #475569;
+          font-family: 'Outfit', sans-serif;
+          width: 100%;
         }
-        .nav-page-title {
-          font-size: 1.1rem;
+
+        .search-input::placeholder {
+          color: #94A3B8;
+        }
+
+        .navbar-right {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex-shrink: 0;
+        }
+
+        .admin-portal-badge {
+          background: transparent;
+          border: none;
+          font-size: 0.875rem;
           font-weight: 600;
-          color: #2C3E50;
+          color: #334155;
+          cursor: pointer;
+          padding: 0.4rem 0.8rem;
+          border-radius: 6px;
+          font-family: 'Outfit', sans-serif;
+          transition: background 0.2s;
         }
-        .nav-user-actions {
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
+
+        .admin-portal-badge:hover {
+          background: #F1F5F9;
         }
-        .nav-user-profile {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-        .profile-avatar {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: rgba(77, 150, 255, 0.1);
-          color: #4D96FF;
+
+        .navbar-bell-btn {
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          color: #64748B;
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 2px solid white;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          transition: background 0.2s, color 0.2s;
         }
-        .profile-info-text {
+
+        .navbar-bell-btn:hover {
+          background: #F1F5F9;
+          color: #334155;
+        }
+
+        .navbar-user-info {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          padding: 0.3rem 0.5rem;
+          border-radius: 8px;
+          transition: background 0.2s;
+        }
+
+        .navbar-user-info:hover {
+          background: #F8FAFC;
+        }
+
+        .navbar-avatar {
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: #4F9CF9;
+          color: white;
+          font-size: 0.75rem;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .navbar-user-text {
           display: flex;
           flex-direction: column;
           line-height: 1.2;
         }
-        .profile-username {
-          font-size: 0.9rem;
-          font-weight: 600;
-          color: #2C3E50;
-          max-width: 140px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .role-badge {
-          font-size: 0.7rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          border-radius: 50px;
-          padding: 0.1rem 0.5rem;
-          margin-top: 0.15rem;
-          width: fit-content;
-        }
-        .role-badge.admin { background: #FFE8EC; color: #FF6B8B; }
-        .role-badge.teacher { background: #E8F5E9; color: #2E7D32; }
-        .role-badge.parent { background: #E3F2FD; color: #1565C0; }
 
-        .nav-logout-btn {
-          background: transparent;
-          border: 1px solid rgba(255, 107, 139, 0.25);
-          color: #FF6B8B;
-          padding: 0.4rem 0.8rem;
-          border-radius: 8px;
-          font-size: 0.85rem;
+        .navbar-user-name {
+          font-size: 0.875rem;
           font-weight: 600;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 0.4rem;
-          transition: all 0.2s;
+          color: #1E293B;
         }
-        .nav-logout-btn:hover {
-          background: #FFE8EC;
-          color: #FF6B8B;
-          transform: translateY(-1px);
-        }
-        .nav-login-redirect-btn {
-          background: #FF6B8B;
-          color: white;
-          border: none;
-          padding: 0.5rem 1.2rem;
-          border-radius: 8px;
-          font-size: 0.9rem;
-          font-weight: 600;
-          cursor: pointer;
-          box-shadow: 0 4px 10px rgba(255,107,139,0.25);
-          transition: all 0.2s;
-        }
-        .nav-login-redirect-btn:hover {
-          background: #FF4A70;
-          transform: translateY(-2px);
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-3px); }
+
+        .navbar-user-role {
+          font-size: 0.75rem;
+          color: #94A3B8;
+          font-weight: 400;
         }
 
         @media (max-width: 768px) {
-          .logout-text { display: none; }
-          .nav-logout-btn { padding: 0.4rem; border-radius: 50%; }
-          .nav-page-title { display: none; }
+          .navbar-search { min-width: 0; }
+          .admin-portal-badge { display: none; }
+          .navbar-user-text { display: none; }
         }
       `}</style>
     </nav>

@@ -157,8 +157,8 @@ const PhotoGallery = () => {
         }
 
         .clear-date-btn:hover {
-          background: #FFE8EC;
-          color: #FF6B8B;
+          background: #E3F2FD;
+          color: #4F9CF9;
         }
 
         @media (max-width: 992px) {

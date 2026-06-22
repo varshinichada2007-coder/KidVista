@@ -95,7 +95,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 
         .modal-close-btn:hover {
           background: rgba(0,0,0,0.05);
-          color: #FF6B8B;
+          color: #4F9CF9;
         }
 
         .modal-body {

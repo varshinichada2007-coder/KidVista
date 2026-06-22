@@ -28,6 +28,7 @@ import PhotoGallery from '../pages/Parent/PhotoGallery';
 import MemoryWall from '../pages/Parent/MemoryWall';
 import ActivityTimeline from '../pages/Parent/ActivityTimeline';
 import ParentAnnouncements from '../pages/Parent/ParentAnnouncements';
+import ParentFeedback from '../pages/Parent/ParentFeedback';
 
 const AppRoutes = () => {
   return (
@@ -97,18 +98,42 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/teacher/create-activity"
+        path="/teacher/upload"
         element={
           <ProtectedRoute allowedRoles={['teacher']}>
-            <CreateActivity />
+            <TeacherDashboard />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/teacher/history"
+        path="/teacher/tagging"
         element={
           <ProtectedRoute allowedRoles={['teacher']}>
-            <UploadHistory />
+            <TeacherDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/activities"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/attendance"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/notifications"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <TeacherDashboard />
           </ProtectedRoute>
         }
       />
@@ -126,7 +151,7 @@ const AppRoutes = () => {
         path="/parent/my-child"
         element={
           <ProtectedRoute allowedRoles={['parent']}>
-            <MyChild />
+            <ParentDashboard />
           </ProtectedRoute>
         }
       />
@@ -134,31 +159,31 @@ const AppRoutes = () => {
         path="/parent/gallery"
         element={
           <ProtectedRoute allowedRoles={['parent']}>
-            <PhotoGallery />
+            <ParentDashboard />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/parent/memory-wall"
+        path="/parent/attendance"
         element={
           <ProtectedRoute allowedRoles={['parent']}>
-            <MemoryWall />
+            <ParentDashboard />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/parent/timeline"
+        path="/parent/notifications"
         element={
           <ProtectedRoute allowedRoles={['parent']}>
-            <ActivityTimeline />
+            <ParentDashboard />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/parent/announcements"
+        path="/parent/profile"
         element={
           <ProtectedRoute allowedRoles={['parent']}>
-            <ParentAnnouncements />
+            <ParentDashboard />
           </ProtectedRoute>
         }
       />

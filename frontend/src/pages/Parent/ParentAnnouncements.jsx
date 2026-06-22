@@ -34,7 +34,7 @@ const ParentAnnouncements = () => {
 
           <div className="glass-panel text-left">
             <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#2C3E50', fontFamily: 'Outfit, sans-serif' }}>
-              <Megaphone size={22} color="#FF6B8B" /> School Bulletin Board
+              <Megaphone size={22} color="#4F9CF9" /> School Bulletin Board
             </h3>
 
             {loading ? (
@@ -90,8 +90,8 @@ const ParentAnnouncements = () => {
         .bulletin-tag-alert {
           font-size: 0.7rem;
           font-weight: 700;
-          background: #FFE8EC;
-          color: #FF6B8B;
+          background: #E3F2FD;
+          color: #4F9CF9;
           padding: 0.2rem 0.5rem;
           border-radius: 6px;
           text-transform: uppercase;

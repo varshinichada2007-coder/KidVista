@@ -233,8 +233,8 @@ const UploadHistory = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, #FFE8EC, #E3F2FD);
-          color: #FF6B8B;
+          background: linear-gradient(135deg, #E3F2FD, #E3F2FD);
+          color: #4F9CF9;
         }
 
         .status-overlay-badge {

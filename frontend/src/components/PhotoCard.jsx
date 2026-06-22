@@ -15,7 +15,7 @@ const PhotoCard = ({ photo }) => {
       const blob = await response.blob();
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
-      link.download = `intellitots-${photo.activity_title.toLowerCase().replace(/\s+/g, '-')}-${photo.id}.jpg`;
+      link.download = `kidvista-${photo.activity_title.toLowerCase().replace(/\s+/g, '-')}-${photo.id}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -41,7 +41,7 @@ const PhotoCard = ({ photo }) => {
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.style.display = 'none';
-                e.target.parentNode.innerHTML = '<div class="sample-photo-fallback"><span class="fallback-emoji">🖼️</span><p class="fallback-lbl">Intellitots Activity Image</p></div>';
+                e.target.parentNode.innerHTML = '<div class="sample-photo-fallback"><span class="fallback-emoji">🖼️</span><p class="fallback-lbl">KidVista Activity Image</p></div>';
               }}
             />
           )}
@@ -128,7 +128,7 @@ const PhotoCard = ({ photo }) => {
               <h2 style={{ color: '#2c3e50', margin: '0.5rem 0' }}>{photo.activity_title}</h2>
               {photo.ai_caption && (
                 <blockquote className="zoom-blockquote">
-                  <Sparkles size={16} style={{ color: '#FF6B8B', marginRight: '6px', shrink: '0' }} />
+                  <Sparkles size={16} style={{ color: '#4F9CF9', marginRight: '6px', shrink: '0' }} />
                   <em>"{photo.ai_caption}"</em>
                 </blockquote>
               )}
@@ -168,8 +168,8 @@ const PhotoCard = ({ photo }) => {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, #FFE8EC, #E3F2FD);
-          color: #FF6B8B;
+          background: linear-gradient(135deg, #E3F2FD, #E3F2FD);
+          color: #4F9CF9;
           min-height: 200px;
         }
         .sample-photo-fallback.large {
@@ -238,11 +238,11 @@ const PhotoCard = ({ photo }) => {
 
         .overlay-btn:hover {
           transform: scale(1.15);
-          color: #FF6B8B;
+          color: #4F9CF9;
         }
 
         .sparkle-icon {
-          color: #FF6B8B;
+          color: #4F9CF9;
           flex-shrink: 0;
           margin-top: 2px;
         }
@@ -311,7 +311,7 @@ const PhotoCard = ({ photo }) => {
         }
 
         .zoom-close-btn:hover {
-          background: #FF6B8B;
+          background: #4F9CF9;
         }
 
         .zoom-modal-image-box {
@@ -344,11 +344,11 @@ const PhotoCard = ({ photo }) => {
         }
 
         .zoom-blockquote {
-          background: #FFE8EC;
-          border-left: 4px solid #FF6B8B;
+          background: #E3F2FD;
+          border-left: 4px solid #4F9CF9;
           padding: 0.75rem 1rem;
           border-radius: 4px;
-          color: #FF6B8B;
+          color: #4F9CF9;
           font-weight: 500;
           display: flex;
           align-items: flex-start;

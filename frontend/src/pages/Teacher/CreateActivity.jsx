@@ -419,7 +419,7 @@ const CreateActivity = () => {
 
         .classroom-banner-meta {
           background: rgba(255, 107, 139, 0.06);
-          color: #FF6B8B;
+          color: #4F9CF9;
           font-size: 0.9rem;
           font-weight: 700;
           padding: 0.6rem 1rem;
@@ -550,7 +550,7 @@ const CreateActivity = () => {
           height: 30px;
           border-radius: 50%;
           background: rgba(255,255,255,0.85);
-          color: #FF6B8B;
+          color: #4F9CF9;
           border: none;
           cursor: pointer;
           display: flex;
@@ -560,7 +560,7 @@ const CreateActivity = () => {
         }
 
         .remove-photo-btn:hover {
-          background: #FF6B8B;
+          background: #4F9CF9;
           color: white;
         }
 
