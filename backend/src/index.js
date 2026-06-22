@@ -35,11 +35,15 @@ app.use(express.urlencoded({ extended: true }));
 // Serve uploaded photos statically
 app.use('/uploads', express.static(uploadsDir));
 
-// Route Mounts
-app.use('/api/auth', authRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/teacher', teacherRoutes);
-app.use('/api/parent', parentRoutes);
+const apiRouter = express.Router();
+apiRouter.use('/auth', authRoutes);
+apiRouter.use('/admin', adminRoutes);
+apiRouter.use('/teacher', teacherRoutes);
+apiRouter.use('/parent', parentRoutes);
+
+// Mount for local dev (/api/...) and Vercel serverless (/...) where routePrefix strips /api
+app.use('/api', apiRouter);
+app.use('/', apiRouter);
 
 // Root Endpoint
 app.get('/', (req, res) => {
