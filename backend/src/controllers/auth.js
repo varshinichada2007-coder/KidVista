@@ -6,7 +6,7 @@ const ADMIN_SECRET_CODE = 'Varshini@20';
 const createToken = (user) => {
   return jwt.sign(
     { id: user.id, role: user.role },
-    process.env.JWT_SECRET || 'firstcry_secret_key',
+    process.env.JWT_SECRET || 'kidvista_secret_key',
     { expiresIn: '1d' }
   );
 };

@@ -8,6 +8,7 @@ router.use(authenticate, authorize(['admin']));
 
 // Stats
 router.get('/stats', adminController.getStats);
+router.get('/analytics', adminController.getAnalytics);
 
 // Classrooms
 router.get('/classrooms', adminController.getClassrooms);

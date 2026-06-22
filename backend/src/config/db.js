@@ -12,11 +12,11 @@ let isFallback = false;
 // Seed data template for JSON store if not exists
 const defaultJSONData = {
   users: [
-    { id: 1, name: 'Preschool Admin', email: 'admin@firstcry.com', password: '', role: 'admin' },
-    { id: 2, name: 'Ms. Clara Jenkins', email: 'teacher@firstcry.com', password: '', role: 'teacher' },
-    { id: 3, name: 'Mr. David Miller', email: 'teacher2@firstcry.com', password: '', role: 'teacher' },
-    { id: 4, name: 'Rahul Patel (Parent of Aarav & Meera)', email: 'parent@firstcry.com', password: '', role: 'parent' },
-    { id: 5, name: 'Priya Sharma (Parent of Diya & Rohan)', email: 'parent2@firstcry.com', password: '', role: 'parent' }
+    { id: 1, name: 'Preschool Admin', email: 'admin@kidvista.com', password: '', role: 'admin' },
+    { id: 2, name: 'Ms. Clara Jenkins', email: 'teacher@kidvista.com', password: '', role: 'teacher' },
+    { id: 3, name: 'Mr. David Miller', email: 'teacher2@kidvista.com', password: '', role: 'teacher' },
+    { id: 4, name: 'Rahul Patel (Parent of Aarav & Meera)', email: 'parent@kidvista.com', password: '', role: 'parent' },
+    { id: 5, name: 'Priya Sharma (Parent of Diya & Rohan)', email: 'parent2@kidvista.com', password: '', role: 'parent' }
   ],
   classrooms: [
     { id: 1, classroom_name: 'Toddlers A' },
@@ -61,7 +61,7 @@ const defaultJSONData = {
     { id: 1, photo_id: 1, student_id: 1 }
   ],
   announcements: [
-    { id: 1, title: 'Annual Sports Day 2026', message: 'FirstCry Intellitots Annual Sports Day is scheduled for next Saturday. Parents are cordially invited to cheer for our tiny champions!', created_at: new Date().toISOString() },
+    { id: 1, title: 'Annual Sports Day 2026', message: 'KidVista Annual Sports Day is scheduled for next Saturday. Parents are cordially invited to cheer for our tiny champions!', created_at: new Date().toISOString() },
     { id: 2, title: 'Summer Vacation Holidays Notice', message: 'Dear Parents, please note that the school will remain closed for summer break from June 20th to July 10th. Have a wonderful summer!', created_at: new Date().toISOString() }
   ]
 };
@@ -100,7 +100,7 @@ try {
     host: DB_HOST || 'localhost',
     user: DB_USER || 'root',
     password: DB_PASSWORD || '',
-    database: DB_NAME || 'intellitots_portal',
+    database: DB_NAME || 'kidvista_portal',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

@@ -62,7 +62,16 @@ router.post('/photos/upload', (req, res) => {
 // Submit Tagged Photos
 router.post('/photos/submit', teacherController.submitPhotos);
 
+// Update Student Tags for photo
+router.post('/photos/:photoId/tags', teacherController.updatePhotoTags);
+
 // History
 router.get('/history', teacherController.getUploadHistory);
+
+// Attendance
+router.post('/attendance', teacherController.markAttendance);
+
+// Routines
+router.post('/routines', teacherController.updateRoutines);
 
 module.exports = router;

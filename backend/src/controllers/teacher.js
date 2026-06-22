@@ -196,6 +196,7 @@ exports.submitPhotos = async (req, res) => {
               id: data.notifications.length > 0 ? Math.max(...data.notifications.map(n => n.id)) + 1 : 1,
               parentEmail,
               message: notificationMsg,
+              type: 'tag',
               readStatus: 'unread',
               createdAt: new Date().toISOString()
             };
@@ -246,5 +247,175 @@ exports.getUploadHistory = async (req, res) => {
   } catch (error) {
     console.error('getUploadHistory error:', error);
     res.status(500).json({ message: 'Error retrieving upload history.' });
+  }
+};
+
+// 7. Mark or update student attendance
+exports.markAttendance = async (req, res) => {
+  const { date, attendanceList } = req.body;
+  if (!date || !attendanceList || !Array.isArray(attendanceList)) {
+    return res.status(400).json({ message: 'Date and attendance list are required.' });
+  }
+
+  try {
+    const data = getData();
+    if (!data.attendance) {
+      data.attendance = [];
+    }
+
+    attendanceList.forEach(item => {
+      const idx = data.attendance.findIndex(a => a.studentId === parseInt(item.studentId) && a.date === date);
+      if (idx !== -1) {
+        data.attendance[idx].status = item.status;
+      } else {
+        const newRecord = {
+          id: data.attendance.length > 0 ? Math.max(...data.attendance.map(a => a.id)) + 1 : 1,
+          studentId: parseInt(item.studentId),
+          date,
+          status: item.status
+        };
+        data.attendance.push(newRecord);
+      }
+    });
+
+    saveData(data);
+    res.status(200).json({ message: 'Attendance records updated successfully.' });
+  } catch (error) {
+    console.error('markAttendance error:', error);
+    res.status(500).json({ message: 'Error marking attendance.' });
+  }
+};
+
+// 8. Update daycare routines, meals, milestones, and classroom notes
+exports.updateRoutines = async (req, res) => {
+  const { studentId, date, breakfast, lunch, snack, classroomNotes, creativity, language, socialSkills, emotionalGrowth, motorSkills } = req.body;
+  if (!studentId || !date) {
+    return res.status(400).json({ message: 'Student ID and date are required.' });
+  }
+
+  try {
+    const data = getData();
+    
+    // 1. Meals Update
+    if (breakfast !== undefined || lunch !== undefined || snack !== undefined) {
+      if (!data.meals) data.meals = [];
+      const mealIdx = data.meals.findIndex(m => m.studentId === parseInt(studentId) && m.date === date);
+      if (mealIdx !== -1) {
+        if (breakfast !== undefined) data.meals[mealIdx].breakfast = breakfast;
+        if (lunch !== undefined) data.meals[mealIdx].lunch = lunch;
+        if (snack !== undefined) data.meals[mealIdx].snack = snack;
+      } else {
+        data.meals.push({
+          id: data.meals.length > 0 ? Math.max(...data.meals.map(m => m.id)) + 1 : 1,
+          studentId: parseInt(studentId),
+          date,
+          breakfast: breakfast || '',
+          lunch: lunch || '',
+          snack: snack || ''
+        });
+      }
+    }
+
+    // 2. Classroom Notes Update
+    if (classroomNotes !== undefined) {
+      const student = data.students.find(s => s.studentId === parseInt(studentId));
+      if (student) {
+        student.classroomNotes = classroomNotes;
+      }
+    }
+
+    // 3. Milestones Update
+    if (creativity !== undefined || language !== undefined || socialSkills !== undefined || emotionalGrowth !== undefined || motorSkills !== undefined) {
+      if (!data.milestones) data.milestones = [];
+      const milestoneIdx = data.milestones.findIndex(m => m.studentId === parseInt(studentId));
+      
+      const creativeVal = creativity !== undefined ? parseInt(creativity) : 80;
+      const langVal = language !== undefined ? parseInt(language) : 80;
+      const socialVal = socialSkills !== undefined ? parseInt(socialSkills) : 80;
+      const emotionalVal = emotionalGrowth !== undefined ? parseInt(emotionalGrowth) : 80;
+      const motorVal = motorSkills !== undefined ? parseInt(motorSkills) : 80;
+
+      if (milestoneIdx !== -1) {
+        if (creativity !== undefined) data.milestones[milestoneIdx].creativity = creativeVal;
+        if (language !== undefined) data.milestones[milestoneIdx].language = langVal;
+        if (socialSkills !== undefined) data.milestones[milestoneIdx].socialSkills = socialVal;
+        if (emotionalGrowth !== undefined) data.milestones[milestoneIdx].emotionalGrowth = emotionalVal;
+        if (motorSkills !== undefined) data.milestones[milestoneIdx].motorSkills = motorVal;
+        data.milestones[milestoneIdx].lastUpdated = new Date().toISOString();
+      } else {
+        data.milestones.push({
+          id: data.milestones.length > 0 ? Math.max(...data.milestones.map(m => m.id)) + 1 : 1,
+          studentId: parseInt(studentId),
+          creativity: creativeVal,
+          language: langVal,
+          socialSkills: socialVal,
+          emotionalGrowth: emotionalVal,
+          motorSkills: motorVal,
+          lastUpdated: new Date().toISOString()
+        });
+      }
+    }
+
+    saveData(data);
+    res.status(200).json({ message: 'Daycare routines updated successfully.' });
+  } catch (error) {
+    console.error('updateRoutines error:', error);
+    res.status(500).json({ message: 'Error updating daycare routines.' });
+  }
+};
+
+// 9. Update photo student tags & notify parents
+exports.updatePhotoTags = async (req, res) => {
+  const { photoId } = req.params;
+  const { student_ids } = req.body;
+  if (!Array.isArray(student_ids)) {
+    return res.status(400).json({ message: 'student_ids must be an array.' });
+  }
+
+  try {
+    const data = getData();
+    const photo = data.photos.find(p => p.id === parseInt(photoId));
+    if (!photo) {
+      return res.status(404).json({ message: 'Photo not found.' });
+    }
+
+    const activity = data.activities.find(a => a.id === photo.activity_id);
+    const activityTitle = activity ? activity.title : 'an activity';
+
+    // Clear old tags for this photo
+    data.student_tags = data.student_tags.filter(t => t.photo_id !== parseInt(photoId));
+
+    // Insert new tags & notify parents of tagged children
+    for (const studentId of student_ids) {
+      const newTag = {
+        id: data.student_tags.length > 0 ? Math.max(...data.student_tags.map(t => t.id)) + 1 : 1,
+        photo_id: parseInt(photoId),
+        studentId: parseInt(studentId)
+      };
+      data.student_tags.push(newTag);
+
+      // Notify parent
+      const studentObj = data.students.find(s => s.studentId === parseInt(studentId));
+      if (studentObj && studentObj.parentEmail) {
+        const parentEmail = studentObj.parentEmail.trim().toLowerCase();
+        const notificationMsg = `Your child ${studentObj.studentName} was tagged in ${activityTitle}.`;
+
+        const notificationObj = {
+          id: data.notifications.length > 0 ? Math.max(...data.notifications.map(n => n.id)) + 1 : 1,
+          parentEmail,
+          message: notificationMsg,
+          type: 'tag',
+          readStatus: 'unread',
+          createdAt: new Date().toISOString()
+        };
+        data.notifications.push(notificationObj);
+      }
+    }
+
+    saveData(data);
+    res.status(200).json({ message: 'Student tags updated successfully.' });
+  } catch (error) {
+    console.error('updatePhotoTags error:', error);
+    res.status(500).json({ message: 'Error updating student tags.' });
   }
 };

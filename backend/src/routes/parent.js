@@ -25,4 +25,8 @@ router.get('/stats', parentController.getStats);
 router.get('/notifications', parentController.getNotifications);
 router.put('/notifications/:id/read', parentController.markNotificationAsRead);
 
+// Progress and Feedback
+router.get('/progress', parentController.getChildProgress);
+router.post('/feedback', parentController.submitFeedback);
+
 module.exports = router;

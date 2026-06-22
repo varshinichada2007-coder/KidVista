@@ -308,3 +308,101 @@ exports.markNotificationAsRead = async (req, res) => {
     res.status(500).json({ message: 'Error updating notification status.' });
   }
 };
+
+// 8. Fetch child progress statistics and logs
+exports.getChildProgress = async (req, res) => {
+  try {
+    const parentId = req.user.id;
+    const data = getData();
+
+    const parentUser = data.users.find(u => u.id === parentId);
+    if (!parentUser) {
+      return res.status(404).json({ message: 'Parent user not found.' });
+    }
+
+    if (parentUser.status === 'pending') {
+      return res.status(200).json({ attendance: [], meals: [], milestones: null });
+    }
+
+    const parentEmail = parentUser.email.trim().toLowerCase();
+    const child = data.students.find(s => s.parentEmail.trim().toLowerCase() === parentEmail);
+    if (!child) {
+      return res.status(200).json({ attendance: [], meals: [], milestones: null, message: 'No children linked to this email' });
+    }
+
+    // 1. Attendance history for this child
+    const attendance = (data.attendance || []).filter(a => a.studentId === child.studentId);
+
+    // 2. Meals log
+    const meals = (data.meals || []).filter(m => m.studentId === child.studentId);
+
+    // 3. Milestones
+    const milestones = (data.milestones || []).find(m => m.studentId === child.studentId) || {
+      creativity: 80,
+      language: 80,
+      socialSkills: 80,
+      emotionalGrowth: 80,
+      motorSkills: 80
+    };
+
+    // 4. Activity participation categories counts
+    const taggedPhotoIds = (data.student_tags || [])
+      .filter(tag => tag.studentId === child.studentId)
+      .map(tag => tag.photo_id);
+
+    const approvedPhotos = (data.photos || []).filter(p => taggedPhotoIds.includes(p.id) && p.status === 'approved');
+    const activityIds = approvedPhotos.map(p => p.activity_id);
+    const childActivities = (data.activities || []).filter(a => activityIds.includes(a.id));
+
+    res.status(200).json({
+      childName: child.studentName,
+      classroom: child.classroom,
+      allergies: child.allergies || 'None',
+      medicalNotes: child.medicalNotes || 'None',
+      attendance,
+      meals,
+      milestones,
+      activities: childActivities
+    });
+  } catch (error) {
+    console.error('getChildProgress error:', error);
+    res.status(500).json({ message: 'Error retrieving child progress.' });
+  }
+};
+
+// 9. Submit parent feedback / survey responses
+exports.submitFeedback = async (req, res) => {
+  const { feedbackText, surveyRating } = req.body;
+  const parentId = req.user.id;
+
+  if (!feedbackText) {
+    return res.status(400).json({ message: 'Feedback text is required.' });
+  }
+
+  try {
+    const data = getData();
+    const parentUser = data.users.find(u => u.id === parentId);
+    if (!parentUser) {
+      return res.status(404).json({ message: 'Parent user not found.' });
+    }
+
+    const newFeedback = {
+      id: (data.feedback || []).length > 0 ? Math.max(...data.feedback.map(f => f.id)) + 1 : 1,
+      parentEmail: parentUser.email,
+      feedbackText,
+      surveyRating: surveyRating ? parseInt(surveyRating) : 5,
+      date: new Date().toISOString()
+    };
+
+    if (!data.feedback) {
+      data.feedback = [];
+    }
+    data.feedback.push(newFeedback);
+    saveData(data);
+
+    res.status(201).json({ message: 'Feedback submitted successfully.', feedback: newFeedback });
+  } catch (error) {
+    console.error('submitFeedback error:', error);
+    res.status(500).json({ message: 'Error saving feedback.' });
+  }
+};

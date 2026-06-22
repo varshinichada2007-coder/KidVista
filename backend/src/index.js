@@ -44,7 +44,7 @@ app.use('/api/parent', parentRoutes);
 // Root Endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: 'FirstCry Intellitots Daily Activity Photo Sharing Portal API is online.',
+    message: 'KidVista Daily Activity Photo Sharing Portal API is online.',
     time: new Date()
   });
 });
@@ -58,9 +58,13 @@ app.use((err, req, res, next) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
-  console.log(`========================================================`);
-  console.log(`🚀 Server running on port http://localhost:${PORT}`);
-  console.log(`📂 Serving static uploads from ${uploadsDir}`);
-  console.log(`========================================================`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`========================================================`);
+    console.log(`🚀 Server running on port http://localhost:${PORT}`);
+    console.log(`📂 Serving static uploads from ${uploadsDir}`);
+    console.log(`========================================================`);
+  });
+}
+
+module.exports = app;

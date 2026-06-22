@@ -10,27 +10,25 @@ const DATA_STORE_PATH = path.join(__dirname, 'data-store.json');
 // Default Seed Data
 const seedData = {
   users: [
-    { id: 1, name: 'Akhil Kumar Chada', email: 'akhilkumarchada86@gmail.com', password: 'Akhil@0806', role: 'admin' },
-    { id: 2, name: 'Aadhya Mehta', email: 'Aadhya@firstcry.com', password: 'Aadhya@789', role: 'teacher' },
-    { id: 3, name: 'Avni Rao', email: 'Avni@firstcry.com', password: 'Avni@789', role: 'teacher' },
-    { id: 4, name: 'Rajesh Sharma', email: 'Rajesh@firstcry.com', password: 'Rajesh@123', role: 'parent' },
-    { id: 5, name: 'Lakshmi Reddy', email: 'Lakshmi@firstcry.com', password: 'Lakshmi@123', role: 'parent' },
-    { id: 6, name: 'Kiran Patel', email: 'Kiran@firstcry.com', password: 'Kiran@123', role: 'parent' },
-    { id: 7, name: 'Neha Verma', email: 'Neha@firstcry.com', password: 'Neha@123', role: 'parent' },
-    { id: 8, name: 'Ravi Kumar', email: 'Ravi@firstcry.com', password: 'Ravi@123', role: 'parent' },
-    { id: 9, name: 'Priya Rao', email: 'Priya@firstcry.com', password: 'Priya@123', role: 'parent' },
-    { id: 10, name: 'Amit Singh', email: 'Amit@firstcry.com', password: 'Amit@123', role: 'parent' },
-    { id: 11, name: 'Deepa Nair', email: 'Deepa@firstcry.com', password: 'Deepa@123', role: 'parent' },
-    { id: 12, name: 'Rohit Gupta', email: 'Rohit@firstcry.com', password: 'Rohit@123', role: 'parent' },
-    { id: 13, name: 'Shweta Joshi', email: 'Shweta@firstcry.com', password: 'Shweta@123', role: 'parent' },
-    { id: 14, name: 'Rahul Chandra', email: 'Rahul@firstcry.com', password: 'Rahul@789', role: 'teacher' }
+    { id: 1, name: 'Akhil Kumar Chada', email: 'akhilkumarchada86@gmail.com', password: 'Akhil@0806', role: 'admin', status: 'approved' },
+    { id: 2, name: 'Aadhya Mehta', email: 'Aadhya@Kidvista.com', password: 'Aadhya@789', role: 'teacher', status: 'approved' },
+    { id: 3, name: 'Arjun Varma', email: 'Arjun@Kidvista.com', password: 'Arjun@789', role: 'teacher', status: 'approved' },
+    { id: 4, name: 'Rajesh Sharma', email: 'Rajesh@KidVista.com', password: 'Rajesh@123', role: 'parent', status: 'approved' },
+    { id: 5, name: 'Lakshmi Reddy', email: 'Lakshmi@KidVista.com', password: 'Lakshmi@123', role: 'parent', status: 'approved' },
+    { id: 6, name: 'Kiran Patel', email: 'Kiran@KidVista.com', password: 'Kiran@123', role: 'parent', status: 'approved' },
+    { id: 7, name: 'Neha Verma', email: 'Neha@KidVista.com', password: 'Neha@123', role: 'parent', status: 'approved' },
+    { id: 8, name: 'Ravi Kumar', email: 'Ravi@KidVista.com', password: 'Ravi@123', role: 'parent', status: 'approved' },
+    { id: 9, name: 'Priya Rao', email: 'Priya@KidVista.com', password: 'Priya@123', role: 'parent', status: 'approved' },
+    { id: 10, name: 'Amit Singh', email: 'Amit@KidVista.com', password: 'Amit@123', role: 'parent', status: 'approved' },
+    { id: 11, name: 'Deepa Nair', email: 'Deepa@KidVista.com', password: 'Deepa@123', role: 'parent', status: 'approved' },
+    { id: 12, name: 'Rohit Gupta', email: 'Rohit@KidVista.com', password: 'Rohit@123', role: 'parent', status: 'approved' },
+    { id: 13, name: 'Shweta Joshi', email: 'Shweta@KidVista.com', password: 'Shweta@123', role: 'parent', status: 'approved' },
+    { id: 14, name: 'Avni Rao', email: 'Avni@Kidvista.com', password: 'Avni@789', role: 'teacher', status: 'approved' }
   ],
   classrooms: [
-    { id: 1, classroom_name: 'Nursery A' },
-    { id: 2, classroom_name: 'Nursery B' },
-    { id: 3, classroom_name: 'LKG A' },
-    { id: 4, classroom_name: 'LKG B' },
-    { id: 5, classroom_name: 'UKG A' }
+    { id: 1, classroom_name: 'Nursery' },
+    { id: 2, classroom_name: 'LKG' },
+    { id: 3, classroom_name: 'UKG' }
   ],
   students: [
     { id: 1, student_name: 'Aarav Sharma', age: 4, classroom_id: 1, parent_id: 4 },
@@ -39,17 +37,15 @@ const seedData = {
     { id: 4, student_name: 'Diya Verma', age: 4, classroom_id: 2, parent_id: 7 },
     { id: 5, student_name: 'Arjun Kumar', age: 5, classroom_id: 3, parent_id: 8 },
     { id: 6, student_name: 'Saanvi Rao', age: 5, classroom_id: 3, parent_id: 9 },
-    { id: 7, student_name: 'Reyansh Singh', age: 5, classroom_id: 4, parent_id: 10 },
-    { id: 8, student_name: 'Aadhya Nair', age: 5, classroom_id: 4, parent_id: 11 },
-    { id: 9, student_name: 'Vivaan Gupta', age: 6, classroom_id: 5, parent_id: 12 },
-    { id: 10, student_name: 'Meera Joshi', age: 6, classroom_id: 5, parent_id: 13 }
+    { id: 7, student_name: 'Reyansh Singh', age: 5, classroom_id: 1, parent_id: 10 },
+    { id: 8, student_name: 'Aadhya Nair', age: 5, classroom_id: 2, parent_id: 11 },
+    { id: 9, student_name: 'Vivaan Gupta', age: 6, classroom_id: 3, parent_id: 12 },
+    { id: 10, student_name: 'Meera Joshi', age: 6, classroom_id: 3, parent_id: 13 }
   ],
   teachers: [
     { id: 1, user_id: 2, classroom_id: 1 },
-    { id: 2, user_id: 2, classroom_id: 2 },
-    { id: 3, user_id: 3, classroom_id: 3 },
-    { id: 4, user_id: 3, classroom_id: 4 },
-    { id: 5, user_id: 14, classroom_id: 5 }
+    { id: 2, user_id: 3, classroom_id: 2 },
+    { id: 3, user_id: 14, classroom_id: 3 }
   ],
   activities: [
     {
@@ -79,7 +75,7 @@ const seedData = {
     { id: 1, photo_id: 1, student_id: 1 }
   ],
   announcements: [
-    { id: 1, title: 'Annual Sports Day 2026', message: 'FirstCry Intellitots Annual Sports Day is scheduled for next Saturday. Parents are cordially invited to cheer for our tiny champions!', created_at: new Date().toISOString() },
+    { id: 1, title: 'Annual Sports Day 2026', message: 'KidVista Annual Sports Day is scheduled for next Saturday. Parents are cordially invited to cheer for our tiny champions!', created_at: new Date().toISOString() },
     { id: 2, title: 'Summer Vacation Holidays Notice', message: 'Dear Parents, please note that the school will remain closed for summer break from June 20th to July 10th. Have a wonderful summer!', created_at: new Date().toISOString() }
   ]
 };
@@ -116,9 +112,9 @@ async function init() {
     });
     // Adapt teachers list for JSON store
     jsonStoreData.teachers = [
-      { id: 1, user_id: 2, classroom: "Nursery A, Nursery B" },
-      { id: 2, user_id: 3, classroom: "LKG A, LKG B" },
-      { id: 3, user_id: 14, classroom: "UKG A" }
+      { id: 1, user_id: 2, classroom: "Nursery" },
+      { id: 2, user_id: 3, classroom: "LKG" },
+      { id: 3, user_id: 14, classroom: "UKG" }
     ];
     // Adapt student tags list for JSON store
     jsonStoreData.student_tags = seedData.student_tags.map(t => ({
@@ -131,16 +127,16 @@ async function init() {
     console.log('✔ Local data-store.json seeded successfully!');
     console.log('\n--- DEMO ACCOUNTS CREDENTIALS (JSON FALLBACK ACTIVE) ---');
     console.log('🔑 Admin: akhilkumarchada86@gmail.com / Akhil@0806');
-    console.log('🔑 Teacher 1: Aadhya Mehta (Aadhya@firstcry.com / Aadhya@789) [Nursery A, B]');
-    console.log('🔑 Teacher 2: Avni Rao (Avni@firstcry.com / Avni@789) [LKG A, B]');
-    console.log('🔑 Teacher 3: Rahul Chandra (Rahul@firstcry.com / Rahul@789) [UKG A]');
+    console.log('🔑 Teacher 1: Aadhya Mehta (Aadhya@Kidvista.com / Aadhya@789) [Nursery]');
+    console.log('🔑 Teacher 2: Arjun Varma (Arjun@Kidvista.com / Arjun@789) [LKG]');
+    console.log('🔑 Teacher 3: Avni Rao (Avni@Kidvista.com / Avni@789) [UKG]');
     console.log('-------------------------------------------------------\n');
     process.exit(0);
   }
 
   try {
     // 2. Create database
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME || 'intellitots_portal'}\`;`);
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME || 'kidvista_portal'}\`;`);
     console.log(`✔ Database "${DB_NAME || 'intellitots_portal'}" verified/created.`);
     
     // 3. Switch to the database
@@ -341,9 +337,9 @@ async function init() {
     console.log('✔ MySQL Seeding completed successfully.');
     console.log('\n--- DEMO ACCOUNTS CREDENTIALS ---');
     console.log('🔑 Admin: akhilkumarchada86@gmail.com / Akhil@0806');
-    console.log('🔑 Teacher 1: Aadhya Mehta (Aadhya@firstcry.com / Aadhya@789) [Nursery A, B]');
-    console.log('🔑 Teacher 2: Avni Rao (Avni@firstcry.com / Avni@789) [LKG A, B]');
-    console.log('🔑 Teacher 3: Rahul Chandra (Rahul@firstcry.com / Rahul@789) [UKG A]');
+    console.log('🔑 Teacher 1: Aadhya Mehta (Aadhya@Kidvista.com / Aadhya@789) [Nursery]');
+    console.log('🔑 Teacher 2: Arjun Varma (Arjun@Kidvista.com / Arjun@789) [LKG]');
+    console.log('🔑 Teacher 3: Avni Rao (Avni@Kidvista.com / Avni@789) [UKG]');
     console.log('---------------------------------\n');
 
   } catch (error) {
