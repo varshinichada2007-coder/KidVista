@@ -105,6 +105,7 @@ function writeJSONDb(data) {
 }
 
 // Attempt real MySQL Pool connection
+console.log(`🔌 Connecting to MySQL at ${dbHost}:${dbPort} (db: ${dbName}, user: ${dbUser})`);
 try {
   pool = mysql.createPool({
     host: dbHost,
@@ -118,7 +119,7 @@ try {
   });
   console.log('✔ Real MySQL database pool configured.');
 } catch (err) {
-  console.warn('⚠️ Real MySQL Pool configuration error. Switching to fallback engine.');
+  console.warn('⚠️ Real MySQL Pool configuration error:', err.message);
   isFallback = true;
 }
 
@@ -628,15 +629,15 @@ if (isFallback) {
   activePool = pool;
   pool.query('SELECT 1')
     .then(() => {
-      console.log('✔ Connected successfully to local MySQL database.');
+      console.log('✔ Connected successfully to MySQL database.');
     })
     .catch((err) => {
-      console.warn('⚠️ Could not communicate with local MySQL server (ECONNREFUSED or credentials error).');
+      console.warn('⚠️ Could not communicate with MySQL server:', err.message);
+      console.warn(`   Host: ${dbHost}, Port: ${dbPort}, DB: ${dbName}`);
       console.log('👉 Falling back to local data-store.json database engine.');
       activePool = new MockDbPool();
       isFallback = true;
-      // Close the real pool so that Node can terminate cleanly without hanging sockets
-      pool.end().catch(() => {});
+      // NOTE: Do NOT call pool.end() here — it drains the event loop and crashes the app
     });
 }
 
