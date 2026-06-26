@@ -146,11 +146,11 @@ async function init() {
 
   try {
     // 2. Create database
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME || 'kidvista_portal'}\`;`);
-    console.log(`✔ Database "${DB_NAME || 'intellitots_portal'}" verified/created.`);
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`);
+    console.log(`✔ Database "${dbName}" verified/created.`);
     
     // 3. Switch to the database
-    await connection.changeUser({ database: DB_NAME || 'intellitots_portal' });
+    await connection.changeUser({ database: dbName });
     
     // 4. Create Tables
     console.log('Creating tables...');
