@@ -111,6 +111,14 @@
       "password": "Avni@789",
       "role": "teacher",
       "status": "approved"
+    },
+    {
+      "id": 15,
+      "name": "Varshini Chada",
+      "email": "varshinichada2007@gmail.com",
+      "password": "anypassword",
+      "role": "parent",
+      "status": "approved"
     }
   ],
   "classrooms": [
@@ -197,6 +205,13 @@
       "age": 6,
       "classroom": "UKG",
       "parentEmail": "Shweta@KidVista.com"
+    },
+    {
+      "studentId": 11,
+      "studentName": "Aarav Chada",
+      "age": 3,
+      "classroom": "Nursery",
+      "parentEmail": "varshinichada2007@gmail.com"
     }
   ],
   "teachers": [
@@ -245,6 +260,11 @@
       "id": 1,
       "photo_id": 1,
       "studentId": 1
+    },
+    {
+      "id": 2,
+      "photo_id": 1,
+      "studentId": 11
     }
   ],
   "announcements": [
