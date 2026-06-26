@@ -1,0 +1,16 @@
+{
+  "name": "kidvista-portal-root",
+  "version": "1.0.0",
+  "description": "Root package.json for KidVista Daily Activity Photo Sharing Portal",
+  "main": "api/index.js",
+  "dependencies": {
+    "@google/generative-ai": "^0.11.4",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.9.8"
+  }
+}

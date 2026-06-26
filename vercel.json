@@ -1,13 +1,11 @@
 {
-  "experimentalServices": {
-    "frontend": {
-      "entrypoint": "frontend",
-      "framework": "vite",
-      "routePrefix": "/"
-    },
-    "backend": {
-      "entrypoint": "backend/src/index.js",
-      "routePrefix": "/api"
-    }
-  }
+  "version": 2,
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "npm install && cd backend && npm install && cd ../frontend && npm install",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/uploads/(.*)", "destination": "/api" },
+    { "source": "/((?!api|uploads).*)", "destination": "/index.html" }
+  ]
 }
