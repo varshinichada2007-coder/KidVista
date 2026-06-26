@@ -26,7 +26,8 @@ const defaultJSONData = {
     { id: 2, name: 'Ms. Clara Jenkins', email: 'teacher@kidvista.com', password: '', role: 'teacher' },
     { id: 3, name: 'Mr. David Miller', email: 'teacher2@kidvista.com', password: '', role: 'teacher' },
     { id: 4, name: 'Rahul Patel (Parent of Aarav & Meera)', email: 'parent@kidvista.com', password: '', role: 'parent' },
-    { id: 5, name: 'Priya Sharma (Parent of Diya & Rohan)', email: 'parent2@kidvista.com', password: '', role: 'parent' }
+    { id: 5, name: 'Priya Sharma (Parent of Diya & Rohan)', email: 'parent2@kidvista.com', password: '', role: 'parent' },
+    { id: 6, name: 'Varshini Chada', email: 'varshinichada2007@gmail.com', password: '', role: 'parent' }
   ],
   classrooms: [
     { id: 1, classroom_name: 'Toddlers A' },
@@ -37,7 +38,8 @@ const defaultJSONData = {
     { id: 1, student_name: 'Aarav Patel', age: 3, classroom_id: 1, parent_id: 4 },
     { id: 2, student_name: 'Diya Sharma', age: 3, classroom_id: 1, parent_id: 5 },
     { id: 3, student_name: 'Meera Patel', age: 4, classroom_id: 2, parent_id: 4 },
-    { id: 4, student_name: 'Rohan Sharma', age: 4, classroom_id: 2, parent_id: 5 }
+    { id: 4, student_name: 'Rohan Sharma', age: 4, classroom_id: 2, parent_id: 5 },
+    { id: 5, student_name: 'Aarav Chada', age: 3, classroom_id: 1, parent_id: 6 }
   ],
   teachers: [
     { id: 1, user_id: 2, classroom_id: 1 },
@@ -68,7 +70,8 @@ const defaultJSONData = {
     }
   ],
   student_tags: [
-    { id: 1, photo_id: 1, student_id: 1 }
+    { id: 1, photo_id: 1, student_id: 1 },
+    { id: 2, photo_id: 1, student_id: 5 }
   ],
   announcements: [
     { id: 1, title: 'Annual Sports Day 2026', message: 'KidVista Annual Sports Day is scheduled for next Saturday. Parents are cordially invited to cheer for our tiny champions!', created_at: new Date().toISOString() },
@@ -86,6 +89,7 @@ defaultJSONData.users[1].password = tHash;
 defaultJSONData.users[2].password = tHash;
 defaultJSONData.users[3].password = pHash;
 defaultJSONData.users[4].password = pHash;
+defaultJSONData.users[5].password = pHash;
 
 // Read JSON DB
 function readJSONDb() {

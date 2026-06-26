@@ -45,13 +45,30 @@ apiRouter.use('/parent', parentRoutes);
 app.use('/api', apiRouter);
 app.use('/', apiRouter);
 
-// Root Endpoint
-app.get('/', (req, res) => {
-  res.json({
-    message: 'KidVista Daily Activity Photo Sharing Portal API is online.',
-    time: new Date()
+// Serve frontend build if it exists
+const frontendDistDir = path.join(__dirname, '../../frontend/dist');
+if (fs.existsSync(frontendDistDir)) {
+  console.log(`✔ Frontend static files detected. Serving from ${frontendDistDir}`);
+  app.use(express.static(frontendDistDir));
+  
+  // React client-side router fallback
+  app.get('*', (req, res, next) => {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+      res.sendFile(path.join(frontendDistDir, 'index.html'));
+    } else {
+      next();
+    }
   });
-});
+} else {
+  // Root Endpoint fallback if frontend is not built
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'KidVista Daily Activity Photo Sharing Portal API is online. Frontend build not detected.',
+      time: new Date()
+    });
+  });
+}
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
