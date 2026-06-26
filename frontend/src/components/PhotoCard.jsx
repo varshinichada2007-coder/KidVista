@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Download, ZoomIn, Eye, Sparkles, MessageCircleCode } from 'lucide-react';
+import { baseURL } from '../services/api';
 
 const PhotoCard = ({ photo }) => {
   const [zoomOpen, setZoomOpen] = useState(false);
-  const baseURL = 'http://localhost:5000';
   const fullImageUrl = photo.image_url.startsWith('http') 
     ? photo.image_url 
     : `${baseURL}${photo.image_url}`;

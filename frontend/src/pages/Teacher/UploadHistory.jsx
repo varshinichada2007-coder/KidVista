@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import API from '../../services/api';
+import API, { baseURL } from '../../services/api';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import { Sparkles, Calendar, Search, Tag, Filter } from 'lucide-react';
@@ -9,8 +9,6 @@ const UploadHistory = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  
-  const baseURL = 'http://localhost:5000';
 
   const fetchHistory = async () => {
     try {

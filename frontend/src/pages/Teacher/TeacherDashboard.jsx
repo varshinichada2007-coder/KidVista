@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import API from '../../services/api';
+import API, { baseURL } from '../../services/api';
 import Sidebar from '../../components/Sidebar';
 import { AuthContext } from '../../context/AuthContext';
 import { 
@@ -519,7 +519,7 @@ const TeacherDashboard = () => {
                             <div key={idx} className="album-card-item" style={{ border: '1px solid #F1F5F9', borderRadius: '12px', overflow: 'hidden', background: '#FFFFFF' }}>
                               <div style={{ height: '180px', background: '#EEF2F6', position: 'relative', overflow: 'hidden' }}>
                                 <img 
-                                  src={alb.photos[0].startsWith('http') ? alb.photos[0] : `http://localhost:5000${alb.photos[0]}`} 
+                                  src={alb.photos[0].startsWith('http') ? alb.photos[0] : `${baseURL}${alb.photos[0]}`} 
                                   alt={alb.title} 
                                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                                   onError={(e) => {
@@ -628,7 +628,7 @@ const TeacherDashboard = () => {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                           {uploadFiles.map((url, idx) => (
                             <div key={idx} style={{ width: '80px', height: '80px', borderRadius: '8px', border: '1px solid #E2E8F0', overflow: 'hidden', position: 'relative' }}>
-                              <img src={`http://localhost:5000${url}`} alt="Uploaded Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              <img src={`${baseURL}${url}`} alt="Uploaded Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                               <button 
                                 type="button" 
                                 onClick={() => handleRemoveUploadFile(idx)}
@@ -731,7 +731,7 @@ const TeacherDashboard = () => {
                               }}
                             >
                               <img 
-                                src={photo.image_url.startsWith('http') ? photo.image_url : `http://localhost:5000${photo.image_url}`} 
+                                src={photo.image_url.startsWith('http') ? photo.image_url : `${baseURL}${photo.image_url}`} 
                                 alt={photo.activity_title} 
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                                 onError={(e) => {

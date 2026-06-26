@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import API from '../../services/api';
+import API, { baseURL } from '../../services/api';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import { Sparkles, Plus, Image as ImageIcon, Trash2, CheckCircle2, ShieldCheck, Tag } from 'lucide-react';
@@ -25,7 +25,6 @@ const CreateActivity = () => {
   const [formError, setFormError] = useState('');
   
   const navigate = useNavigate();
-  const baseURL = 'http://localhost:5000';
 
   const fetchClassroom = async () => {
     try {

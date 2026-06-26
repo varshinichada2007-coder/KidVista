@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import API from '../../services/api';
+import API, { baseURL } from '../../services/api';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import { Check, X, Sparkles, User, Calendar, Tag, Image, CheckCircle } from 'lucide-react';
@@ -9,8 +9,6 @@ const PhotoApproval = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-
-  const baseURL = 'http://localhost:5000';
 
   const fetchPending = async () => {
     try {
