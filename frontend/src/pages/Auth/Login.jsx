@@ -26,16 +26,67 @@ const Login = () => {
   const [resetSuccess, setResetSuccess] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
 
-  // Clear inputs when role is changed
+  // Clear inputs and pre-fill demo credentials when role is changed
   useEffect(() => {
-    setEmail('');
-    setPassword('');
-    setAdminSecret('');
     setError('');
+    if (selectedRole === 'parent') {
+      setEmail('Rajesh@KidVista.com');
+      setPassword('Rajesh@123');
+      setAdminSecret('');
+    } else if (selectedRole === 'teacher') {
+      setEmail('Aadhya@Kidvista.com');
+      setPassword('Aadhya@789');
+      setAdminSecret('');
+    } else if (selectedRole === 'admin') {
+      setEmail('akhilkumarchada86@gmail.com');
+      setPassword('Akhil@0806');
+      setAdminSecret('Varshini@20');
+    } else {
+      setEmail('');
+      setPassword('');
+      setAdminSecret('');
+    }
   }, [selectedRole]);
 
+  const handleDemoFillAndSubmit = async (e) => {
+    if (e) e.preventDefault();
+    let targetEmail = '';
+    let targetPassword = '';
+    let targetSecret = '';
+
+    if (selectedRole === 'parent') {
+      targetEmail = 'Rajesh@KidVista.com';
+      targetPassword = 'Rajesh@123';
+    } else if (selectedRole === 'teacher') {
+      targetEmail = 'Aadhya@Kidvista.com';
+      targetPassword = 'Aadhya@789';
+    } else if (selectedRole === 'admin') {
+      targetEmail = 'akhilkumarchada86@gmail.com';
+      targetPassword = 'Akhil@0806';
+      targetSecret = 'Varshini@20';
+    }
+
+    setEmail(targetEmail);
+    setPassword(targetPassword);
+    setAdminSecret(targetSecret);
+    setError('');
+    setLoading(true);
+
+    try {
+      const userObj = await login(targetEmail, targetPassword, targetSecret);
+      if (userObj.role === 'admin') navigate('/admin');
+      else if (userObj.role === 'teacher') navigate('/teacher');
+      else if (userObj.role === 'parent') navigate('/parent');
+      else navigate('/');
+    } catch (err) {
+      setError(err || 'Authentication failed. Please verify credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setError('');
     setLoading(true);
 
@@ -244,7 +295,7 @@ const Login = () => {
               </button>
             </form>
 
-            <div className="demo-fill-card" onClick={handleSubmit}>
+            <div className="demo-fill-card" onClick={handleDemoFillAndSubmit}>
               <span className="fill-icon">🔑</span>
               <div>
                 <strong>Demo credentials pre-filled</strong>
