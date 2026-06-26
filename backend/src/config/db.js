@@ -3,7 +3,17 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
+const { 
+  MYSQLHOST, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE, MYSQLPORT,
+  DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT 
+} = process.env;
+
+// Use MYSQL* (Railway style) if present, fall back to DB_* style
+const dbHost = MYSQLHOST || DB_HOST || 'localhost';
+const dbUser = MYSQLUSER || DB_USER || 'root';
+const dbPassword = MYSQLPASSWORD || DB_PASSWORD || '';
+const dbName = MYSQLDATABASE || DB_NAME || 'kidvista_portal';
+const dbPort = parseInt(MYSQLPORT || DB_PORT || '3306');
 const DATA_STORE_PATH = path.join(__dirname, '../../data-store.json');
 
 let pool = null;
@@ -97,10 +107,11 @@ function writeJSONDb(data) {
 // Attempt real MySQL Pool connection
 try {
   pool = mysql.createPool({
-    host: DB_HOST || 'localhost',
-    user: DB_USER || 'root',
-    password: DB_PASSWORD || '',
-    database: DB_NAME || 'kidvista_portal',
+    host: dbHost,
+    port: dbPort,
+    user: dbUser,
+    password: dbPassword,
+    database: dbName,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

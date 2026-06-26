@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const { getData, saveData } = require('../config/jsonDb');
+const bcrypt = require('bcryptjs');
+const db = require('../config/db');
 
 const ADMIN_SECRET_CODE = 'Varshini@20';
 
@@ -24,12 +25,21 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const data = getData();
-    const user = data.users.find(
-      (u) => u.email.trim().toLowerCase() === email.trim().toLowerCase() && u.password === password
-    );
+    const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email.trim().toLowerCase()]);
+    if (rows.length === 0) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    const user = rows[0];
 
-    if (!user) {
+    // Check password
+    let passwordMatch = false;
+    if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
+        passwordMatch = await bcrypt.compare(password, user.password);
+    } else {
+        passwordMatch = (user.password === password);
+    }
+
+    if (!passwordMatch) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
@@ -41,22 +51,33 @@ exports.login = async (req, res) => {
     }
 
     // Load parent's linked student if parent is approved
-    const linkedStudent =
-      user.role === 'parent' && user.status === 'approved'
-        ? data.students.find((s) => s.parentEmail.trim().toLowerCase() === user.email.trim().toLowerCase())
-        : null;
+    let linkedStudent = null;
+    if (user.role === 'parent' && user.status === 'approved') {
+      const [sRows] = await db.query(`
+        SELECT s.*, c.classroom_name 
+        FROM students s 
+        LEFT JOIN classrooms c ON s.classroom_id = c.id 
+        WHERE s.parent_id = ?
+      `, [user.id]);
+      
+      if (sRows.length > 0) {
+          const s = sRows[0];
+          linkedStudent = {
+            studentId: s.id,
+            studentName: s.student_name,
+            age: s.age,
+            classroom: s.classroom_name || 'Nursery A',
+            parentEmail: user.email
+          };
+      }
+    }
 
     // Create a login success notification for parent
     if (user.role === 'parent') {
-      const newNotification = {
-        id: data.notifications.length > 0 ? Math.max(...data.notifications.map(n => n.id)) + 1 : 1,
-        parentEmail: user.email,
-        message: 'You have successfully logged into your account.',
-        readStatus: 'unread',
-        createdAt: new Date().toISOString()
-      };
-      data.notifications.push(newNotification);
-      saveData(data);
+      await db.execute(
+        'INSERT INTO notifications (parent_email, message, type, read_status) VALUES (?, ?, ?, ?)',
+        [user.email, 'You have successfully logged into your account.', 'login', 'unread']
+      );
     }
 
     const token = createToken(user);
@@ -91,32 +112,32 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: 'Only teacher and parent signup allowed' });
     }
 
-    // If Parent selected, require child fields
     if (role === 'parent' && (!childName || !childAge || !requestedClassroom)) {
       return res.status(400).json({ message: 'Child Name, Age, and Requested Classroom are required for parent signup' });
     }
 
-    const data = getData();
-    const exists = data.users.find((u) => u.email.trim().toLowerCase() === email.trim().toLowerCase());
-
-    if (exists) {
+    const [existsRows] = await db.query('SELECT id FROM users WHERE email = ?', [email.trim().toLowerCase()]);
+    if (existsRows.length > 0) {
       return res.status(409).json({ message: 'Email already registered' });
     }
 
-    const newUser = {
-      id: data.users.length > 0 ? Math.max(...data.users.map(u => u.id)) + 1 : 1,
-      name,
-      email: email.trim().toLowerCase(),
-      password,
-      role,
-      status: role === 'parent' ? 'pending' : 'approved',
-      childName: role === 'parent' ? childName : null,
-      childAge: role === 'parent' ? parseInt(childAge) : null,
-      requestedClassroom: role === 'parent' ? requestedClassroom : null
-    };
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const status = role === 'parent' ? 'pending' : 'approved';
 
-    data.users.push(newUser);
-    saveData(data);
+    await db.execute(
+      `INSERT INTO users (name, email, password, role, status, child_name, child_age, requested_classroom) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        name, 
+        email.trim().toLowerCase(), 
+        hashedPassword, 
+        role, 
+        status,
+        role === 'parent' ? childName : null,
+        role === 'parent' ? parseInt(childAge) : null,
+        role === 'parent' ? requestedClassroom : null
+      ]
+    );
 
     res.status(201).json({
       message: role === 'parent' 
@@ -131,17 +152,32 @@ exports.signup = async (req, res) => {
 
 exports.getMe = async (req, res) => {
   try {
-    const data = getData();
-    const user = data.users.find((u) => u.id === req.user.id);
-
-    if (!user) {
+    const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [req.user.id]);
+    if (rows.length === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
+    const user = rows[0];
 
-    const linkedStudent =
-      user.role === 'parent' && user.status === 'approved'
-        ? data.students.find((s) => s.parentEmail.trim().toLowerCase() === user.email.trim().toLowerCase())
-        : null;
+    let linkedStudent = null;
+    if (user.role === 'parent' && user.status === 'approved') {
+      const [sRows] = await db.query(`
+        SELECT s.*, c.classroom_name 
+        FROM students s 
+        LEFT JOIN classrooms c ON s.classroom_id = c.id 
+        WHERE s.parent_id = ?
+      `, [user.id]);
+      
+      if (sRows.length > 0) {
+          const s = sRows[0];
+          linkedStudent = {
+            studentId: s.id,
+            studentName: s.student_name,
+            age: s.age,
+            classroom: s.classroom_name || 'Nursery A',
+            parentEmail: user.email
+          };
+      }
+    }
 
     res.json({
       user: {
@@ -171,14 +207,13 @@ exports.resetAdminPassword = async (req, res) => {
       return res.status(401).json({ message: 'Invalid admin secret code' });
     }
 
-    const data = getData();
-    const adminUser = data.users.find(u => u.role === 'admin');
-    if (!adminUser) {
+    const [rows] = await db.query('SELECT * FROM users WHERE role = "admin" AND email = ?', [email.trim().toLowerCase()]);
+    if (rows.length === 0) {
       return res.status(404).json({ message: 'Admin account not found.' });
     }
 
-    adminUser.password = newPassword;
-    saveData(data);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await db.execute('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, rows[0].id]);
 
     res.json({ message: 'Admin password updated successfully.' });
   } catch (error) {

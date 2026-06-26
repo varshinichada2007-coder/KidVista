@@ -4,7 +4,16 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
+const { 
+  MYSQLHOST, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE, MYSQLPORT,
+  DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT 
+} = process.env;
+
+const dbHost = MYSQLHOST || DB_HOST || 'localhost';
+const dbUser = MYSQLUSER || DB_USER || 'root';
+const dbPassword = MYSQLPASSWORD || DB_PASSWORD || '';
+const dbName = MYSQLDATABASE || DB_NAME || 'kidvista_portal';
+const dbPort = parseInt(MYSQLPORT || DB_PORT || '3306');
 const DATA_STORE_PATH = path.join(__dirname, 'data-store.json');
 
 // Default Seed Data
@@ -87,9 +96,10 @@ async function init() {
   let connection;
   try {
     connection = await mysql.createConnection({
-      host: DB_HOST || 'localhost',
-      user: DB_USER || 'root',
-      password: DB_PASSWORD || '',
+      host: dbHost,
+      port: dbPort,
+      user: dbUser,
+      password: dbPassword,
       multipleStatements: true
     });
     console.log('✔ Connected to MySQL server.');
@@ -145,7 +155,7 @@ async function init() {
     // 4. Create Tables
     console.log('Creating tables...');
     await connection.query('SET FOREIGN_KEY_CHECKS = 0;');
-    const tables = ['student_tags', 'photos', 'activities', 'teachers', 'students', 'classrooms', 'users', 'announcements'];
+    const tables = ['feedback', 'notifications', 'milestones', 'meals', 'attendance', 'student_tags', 'photos', 'activities', 'teachers', 'students', 'classrooms', 'users', 'announcements'];
     for (const table of tables) {
       await connection.query(`DROP TABLE IF EXISTS \`${table}\`;`);
     }
@@ -160,6 +170,10 @@ async function init() {
         email VARCHAR(255) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
         role ENUM('admin', 'teacher', 'parent') NOT NULL,
+        status ENUM('pending', 'approved', 'rejected') DEFAULT 'approved',
+        child_name VARCHAR(255) NULL,
+        child_age INT NULL,
+        requested_classroom VARCHAR(255) NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       ) ENGINE=InnoDB;
     `);
@@ -180,6 +194,9 @@ async function init() {
         age INT NOT NULL,
         classroom_id INT,
         parent_id INT,
+        medical_notes TEXT,
+        allergies TEXT,
+        classroom_notes TEXT,
         FOREIGN KEY (classroom_id) REFERENCES classrooms(id) ON DELETE SET NULL,
         FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE SET NULL
       ) ENGINE=InnoDB;
@@ -250,6 +267,68 @@ async function init() {
       ) ENGINE=InnoDB;
     `);
 
+    // Create ATTENDANCE
+    await connection.query(`
+      CREATE TABLE attendance (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        student_id INT,
+        date DATE,
+        status VARCHAR(50),
+        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+
+    // Create MEALS
+    await connection.query(`
+      CREATE TABLE meals (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        student_id INT,
+        date DATE,
+        breakfast VARCHAR(255),
+        lunch VARCHAR(255),
+        snack VARCHAR(255),
+        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+
+    // Create MILESTONES
+    await connection.query(`
+      CREATE TABLE milestones (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        student_id INT UNIQUE,
+        creativity INT DEFAULT 80,
+        language INT DEFAULT 80,
+        social_skills INT DEFAULT 80,
+        emotional_growth INT DEFAULT 80,
+        motor_skills INT DEFAULT 80,
+        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB;
+    `);
+
+    // Create NOTIFICATIONS
+    await connection.query(`
+      CREATE TABLE notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        parent_email VARCHAR(255),
+        message TEXT,
+        type VARCHAR(50),
+        read_status ENUM('read', 'unread') DEFAULT 'unread',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB;
+    `);
+
+    // Create FEEDBACK
+    await connection.query(`
+      CREATE TABLE feedback (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        parent_email VARCHAR(255),
+        feedback_text TEXT,
+        survey_rating INT DEFAULT 5,
+        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB;
+    `);
+
     console.log('✔ All tables created successfully.');
 
     // 5. Seed Data
@@ -259,8 +338,8 @@ async function init() {
     for (const u of seedData.users) {
       const hashedPassword = bcrypt.hashSync(u.password, 10);
       await connection.execute(
-        'INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)',
-        [u.id, u.name, u.email, hashedPassword, u.role]
+        'INSERT INTO users (id, name, email, password, role, status) VALUES (?, ?, ?, ?, ?, ?)',
+        [u.id, u.name, u.email, hashedPassword, u.role, u.status || 'approved']
       );
     }
 

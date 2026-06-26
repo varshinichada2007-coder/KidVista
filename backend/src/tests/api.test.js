@@ -53,7 +53,7 @@ async function runTests() {
     const adminLoginRes = await fetch(`http://localhost:${PORT}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'admin@kidvista.com', password: 'admin123' })
+      body: JSON.stringify({ email: 'akhilkumarchada86@gmail.com', password: 'Akhil@0806', adminSecret: 'Varshini@20' })
     });
     
     if (adminLoginRes.status !== 200) {
@@ -81,7 +81,7 @@ async function runTests() {
     const parentLoginRes = await fetch(`http://localhost:${PORT}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'parent@kidvista.com', password: 'parent123' })
+      body: JSON.stringify({ email: 'Rajesh@KidVista.com', password: 'Rajesh@123' })
     });
 
     if (parentLoginRes.status !== 200) {

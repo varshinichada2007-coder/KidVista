@@ -226,18 +226,7 @@
       "classroom_id": 1,
       "teacher_id": 2,
       "ai_summary": "Today, children participated in a creative hand painting session that helped improve imagination, sensory exploration, and fine motor skills.",
-      "created_at": "2026-06-18T20:14:16.006Z"
-    },
-    {
-      "id": 2,
-      "title": "djfg",
-      "description": "dgsyhei",
-      "category": "Learning Activity",
-      "activity_date": "2026-06-19",
-      "classroom": "Nursery",
-      "teacher_id": 2,
-      "ai_summary": "dgsyhei",
-      "created_at": "2026-06-19T06:06:44.398Z"
+      "created_at": "2026-06-25T07:05:04.526Z"
     }
   ],
   "photos": [
@@ -248,16 +237,7 @@
       "ai_caption": "Our little learners explored their creativity with colorful handprints today!",
       "status": "approved",
       "uploaded_by": 2,
-      "uploaded_at": "2026-06-18T20:14:16.007Z"
-    },
-    {
-      "id": 2,
-      "activity_id": 2,
-      "image_url": "/uploads/1781849195913-615036501.png",
-      "ai_caption": "dgsyhei",
-      "status": "approved",
-      "uploaded_by": 2,
-      "uploaded_at": "2026-06-19T06:06:44.427Z"
+      "uploaded_at": "2026-06-25T07:05:04.527Z"
     }
   ],
   "student_tags": [
@@ -265,26 +245,6 @@
       "id": 1,
       "photo_id": 1,
       "studentId": 1
-    },
-    {
-      "id": 2,
-      "photo_id": 2,
-      "studentId": 6
-    },
-    {
-      "id": 3,
-      "photo_id": 2,
-      "studentId": 3
-    },
-    {
-      "id": 4,
-      "photo_id": 2,
-      "studentId": 9
-    },
-    {
-      "id": 5,
-      "photo_id": 2,
-      "studentId": 8
     }
   ],
   "announcements": [
@@ -292,13 +252,13 @@
       "id": 1,
       "title": "Annual Sports Day 2026",
       "message": "KidVista Annual Sports Day is scheduled for next Saturday. Parents are cordially invited to cheer for our tiny champions!",
-      "created_at": "2026-06-18T20:14:16.007Z"
+      "created_at": "2026-06-25T07:05:04.527Z"
     },
     {
       "id": 2,
       "title": "Summer Vacation Holidays Notice",
       "message": "Dear Parents, please note that the school will remain closed for summer break from June 20th to July 10th. Have a wonderful summer!",
-      "created_at": "2026-06-18T20:14:16.007Z"
+      "created_at": "2026-06-25T07:05:04.527Z"
     }
   ],
   "notifications": [
@@ -307,133 +267,7 @@
       "parentEmail": "Rajesh@KidVista.com",
       "message": "You have successfully logged into your account.",
       "readStatus": "unread",
-      "createdAt": "2026-06-19T04:30:35.205Z"
-    },
-    {
-      "id": 2,
-      "parentEmail": "Rajesh@KidVista.com",
-      "message": "You have successfully logged into your account.",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:05:59.544Z"
-    },
-    {
-      "id": 3,
-      "parentEmail": "deepa@kidvista.com",
-      "message": "Your child Aadhya Nair was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:06:44.427Z"
-    },
-    {
-      "id": 4,
-      "parentEmail": "rajesh@kidvista.com",
-      "message": "Your child Aarav Sharma was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:06:44.427Z"
-    },
-    {
-      "id": 5,
-      "parentEmail": "lakshmi@kidvista.com",
-      "message": "Your child Anaya Reddy was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:06:44.427Z"
-    },
-    {
-      "id": 6,
-      "parentEmail": "ravi@kidvista.com",
-      "message": "Your child Arjun Kumar was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:06:44.427Z"
-    },
-    {
-      "id": 7,
-      "parentEmail": "neha@kidvista.com",
-      "message": "Your child Diya Verma was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:06:44.428Z"
-    },
-    {
-      "id": 8,
-      "parentEmail": "shweta@kidvista.com",
-      "message": "Your child Meera Joshi was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:06:44.428Z"
-    },
-    {
-      "id": 9,
-      "parentEmail": "amit@kidvista.com",
-      "message": "Your child Reyansh Singh was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:06:44.428Z"
-    },
-    {
-      "id": 10,
-      "parentEmail": "priya@kidvista.com",
-      "message": "Your child Saanvi Rao was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:06:44.428Z"
-    },
-    {
-      "id": 11,
-      "parentEmail": "kiran@kidvista.com",
-      "message": "Your child Vihaan Patel was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:06:44.428Z"
-    },
-    {
-      "id": 12,
-      "parentEmail": "rohit@kidvista.com",
-      "message": "Your child Vivaan Gupta was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:06:44.428Z"
-    },
-    {
-      "id": 13,
-      "parentEmail": "priya@kidvista.com",
-      "message": "Your child Saanvi Rao was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:07:00.008Z"
-    },
-    {
-      "id": 14,
-      "parentEmail": "kiran@kidvista.com",
-      "message": "Your child Vihaan Patel was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:07:00.008Z"
-    },
-    {
-      "id": 15,
-      "parentEmail": "rohit@kidvista.com",
-      "message": "Your child Vivaan Gupta was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:07:00.008Z"
-    },
-    {
-      "id": 16,
-      "parentEmail": "deepa@kidvista.com",
-      "message": "Your child Aadhya Nair was tagged in djfg.",
-      "type": "tag",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T06:07:00.008Z"
-    },
-    {
-      "id": 17,
-      "parentEmail": "Rajesh@KidVista.com",
-      "message": "You have successfully logged into your account.",
-      "readStatus": "unread",
-      "createdAt": "2026-06-19T08:42:47.395Z"
+      "createdAt": "2026-06-25T09:26:36.613Z"
     }
   ]
 }
