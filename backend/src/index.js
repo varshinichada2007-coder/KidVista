@@ -34,6 +34,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Request logging middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    console.log(`[HTTP] ${req.method} ${req.originalUrl} - Status: ${res.statusCode} (${Date.now() - start}ms)`);
+  });
+  next();
+});
+
 // Serve uploaded photos statically (only works locally, not on Vercel's read-only FS)
 app.use('/uploads', express.static(uploadsDir));
 

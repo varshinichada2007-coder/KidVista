@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey_kidvista_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey_firstcry_intellitots_2026';
 
 // Middleware to authenticate user and decode token
 const authenticate = (req, res, next) => {
