@@ -25,28 +25,44 @@ let isFallback = false;
 // Seed data template for JSON store if not exists
 const defaultJSONData = {
   users: [
-    { id: 1, name: 'Preschool Admin', email: 'admin@kidvista.com', password: '', role: 'admin' },
-    { id: 2, name: 'Ms. Clara Jenkins', email: 'teacher@kidvista.com', password: '', role: 'teacher' },
-    { id: 3, name: 'Mr. David Miller', email: 'teacher2@kidvista.com', password: '', role: 'teacher' },
-    { id: 4, name: 'Rahul Patel (Parent of Aarav & Meera)', email: 'parent@kidvista.com', password: '', role: 'parent' },
-    { id: 5, name: 'Priya Sharma (Parent of Diya & Rohan)', email: 'parent2@kidvista.com', password: '', role: 'parent' },
-    { id: 6, name: 'Varshini Chada', email: 'varshinichada2007@gmail.com', password: '', role: 'parent' }
+    { id: 1, name: 'Akhil Kumar Chada', email: 'akhilkumarchada86@gmail.com', password: 'Akhil@0806', role: 'admin', status: 'approved' },
+    { id: 2, name: 'Aadhya Mehta', email: 'Aadhya@Kidvista.com', password: 'Aadhya@789', role: 'teacher', status: 'approved' },
+    { id: 3, name: 'Arjun Varma', email: 'Arjun@Kidvista.com', password: 'Arjun@789', role: 'teacher', status: 'approved' },
+    { id: 4, name: 'Rajesh Sharma', email: 'Rajesh@KidVista.com', password: 'Rajesh@123', role: 'parent', status: 'approved' },
+    { id: 5, name: 'Lakshmi Reddy', email: 'Lakshmi@KidVista.com', password: 'Lakshmi@123', role: 'parent', status: 'approved' },
+    { id: 6, name: 'Kiran Patel', email: 'Kiran@KidVista.com', password: 'Kiran@123', role: 'parent', status: 'approved' },
+    { id: 7, name: 'Neha Verma', email: 'Neha@KidVista.com', password: 'Neha@123', role: 'parent', status: 'approved' },
+    { id: 8, name: 'Ravi Kumar', email: 'Ravi@KidVista.com', password: 'Ravi@123', role: 'parent', status: 'approved' },
+    { id: 9, name: 'Priya Rao', email: 'Priya@KidVista.com', password: 'Priya@123', role: 'parent', status: 'approved' },
+    { id: 10, name: 'Amit Singh', email: 'Amit@KidVista.com', password: 'Amit@123', role: 'parent', status: 'approved' },
+    { id: 11, name: 'Deepa Nair', email: 'Deepa@KidVista.com', password: 'Deepa@123', role: 'parent', status: 'approved' },
+    { id: 12, name: 'Rohit Gupta', email: 'Rohit@KidVista.com', password: 'Rohit@123', role: 'parent', status: 'approved' },
+    { id: 13, name: 'Shweta Joshi', email: 'Shweta@KidVista.com', password: 'Shweta@123', role: 'parent', status: 'approved' },
+    { id: 14, name: 'Avni Rao', email: 'Avni@Kidvista.com', password: 'Avni@789', role: 'teacher', status: 'approved' },
+    { id: 15, name: 'Varshini Chada', email: 'varshinichada2007@gmail.com', password: 'anypassword', role: 'parent', status: 'approved' }
   ],
   classrooms: [
-    { id: 1, classroom_name: 'Toddlers A' },
-    { id: 2, classroom_name: 'Pre-K B' },
-    { id: 3, classroom_name: 'Kindergarten C' }
+    { id: 1, classroom_name: 'Nursery' },
+    { id: 2, classroom_name: 'LKG' },
+    { id: 3, classroom_name: 'UKG' }
   ],
   students: [
-    { id: 1, student_name: 'Aarav Patel', age: 3, classroom_id: 1, parent_id: 4 },
-    { id: 2, student_name: 'Diya Sharma', age: 3, classroom_id: 1, parent_id: 5 },
-    { id: 3, student_name: 'Meera Patel', age: 4, classroom_id: 2, parent_id: 4 },
-    { id: 4, student_name: 'Rohan Sharma', age: 4, classroom_id: 2, parent_id: 5 },
-    { id: 5, student_name: 'Aarav Chada', age: 3, classroom_id: 1, parent_id: 6 }
+    { studentId: 1, studentName: 'Aarav Sharma', age: 4, classroom: 'Nursery', parentEmail: 'Rajesh@KidVista.com' },
+    { studentId: 2, studentName: 'Anaya Reddy', age: 4, classroom: 'Nursery', parentEmail: 'Lakshmi@KidVista.com' },
+    { studentId: 3, studentName: 'Vihaan Patel', age: 4, classroom: 'LKG', parentEmail: 'Kiran@KidVista.com' },
+    { studentId: 4, studentName: 'Diya Verma', age: 4, classroom: 'LKG', parentEmail: 'Neha@KidVista.com' },
+    { studentId: 5, studentName: 'Arjun Kumar', age: 5, classroom: 'UKG', parentEmail: 'Ravi@KidVista.com' },
+    { studentId: 6, studentName: 'Saanvi Rao', age: 5, classroom: 'UKG', parentEmail: 'Priya@KidVista.com' },
+    { studentId: 7, studentName: 'Reyansh Singh', age: 5, classroom: 'Nursery', parentEmail: 'Amit@KidVista.com' },
+    { studentId: 8, studentName: 'Aadhya Nair', age: 5, classroom: 'LKG', parentEmail: 'Deepa@KidVista.com' },
+    { studentId: 9, studentName: 'Vivaan Gupta', age: 6, classroom: 'UKG', parentEmail: 'Rohit@KidVista.com' },
+    { studentId: 10, studentName: 'Meera Joshi', age: 6, classroom: 'UKG', parentEmail: 'Shweta@KidVista.com' },
+    { studentId: 11, studentName: 'Aarav Chada', age: 3, classroom: 'Nursery', parentEmail: 'varshinichada2007@gmail.com' }
   ],
   teachers: [
-    { id: 1, user_id: 2, classroom_id: 1 },
-    { id: 2, user_id: 3, classroom_id: 2 }
+    { id: 1, user_id: 2, classroom: 'Nursery' },
+    { id: 2, user_id: 3, classroom: 'LKG' },
+    { id: 3, user_id: 14, classroom: 'UKG' }
   ],
   activities: [
     {
@@ -58,7 +74,7 @@ const defaultJSONData = {
       classroom_id: 1,
       teacher_id: 2,
       ai_summary: 'Today, children participated in a creative hand painting session that helped improve imagination, sensory exploration, and fine motor skills.',
-      created_at: new Date().toISOString()
+      created_at: '2026-06-25T07:05:04.526Z'
     }
   ],
   photos: [
@@ -69,30 +85,29 @@ const defaultJSONData = {
       ai_caption: 'Our little learners explored their creativity with colorful handprints today!',
       status: 'approved',
       uploaded_by: 2,
-      uploaded_at: new Date().toISOString()
+      uploaded_at: '2026-06-25T07:05:04.527Z'
     }
   ],
   student_tags: [
-    { id: 1, photo_id: 1, student_id: 1 },
-    { id: 2, photo_id: 1, student_id: 5 }
+    { id: 1, photo_id: 1, studentId: 1 },
+    { id: 2, photo_id: 1, studentId: 11 }
   ],
   announcements: [
-    { id: 1, title: 'Annual Sports Day 2026', message: 'KidVista Annual Sports Day is scheduled for next Saturday. Parents are cordially invited to cheer for our tiny champions!', created_at: new Date().toISOString() },
-    { id: 2, title: 'Summer Vacation Holidays Notice', message: 'Dear Parents, please note that the school will remain closed for summer break from June 20th to July 10th. Have a wonderful summer!', created_at: new Date().toISOString() }
+    { id: 1, title: 'Annual Sports Day 2026', message: 'KidVista Annual Sports Day is scheduled for next Saturday. Parents are cordially invited to cheer for our tiny champions!', created_at: '2026-06-25T07:05:04.527Z' },
+    { id: 2, title: 'Summer Vacation Holidays Notice', message: 'Dear Parents, please note that the school will remain closed for summer break from June 20th to July 10th. Have a wonderful summer!', created_at: '2026-06-25T07:05:04.527Z' }
+  ],
+  notifications: [
+    { id: 1, parentEmail: 'Rajesh@KidVista.com', message: 'You have successfully logged into your account.', readStatus: 'unread', createdAt: '2026-06-25T09:26:36.613Z' }
   ]
 };
 
-// Fill in default hashed passwords for JSON store if needed
+// Automatically hash user passwords in defaultJSONData on startup
 const bcrypt = require('bcryptjs');
-const hash = bcrypt.hashSync('admin123', 10);
-const tHash = bcrypt.hashSync('teacher123', 10);
-const pHash = bcrypt.hashSync('parent123', 10);
-defaultJSONData.users[0].password = hash;
-defaultJSONData.users[1].password = tHash;
-defaultJSONData.users[2].password = tHash;
-defaultJSONData.users[3].password = pHash;
-defaultJSONData.users[4].password = pHash;
-defaultJSONData.users[5].password = pHash;
+defaultJSONData.users.forEach(u => {
+  if (u.password && !u.password.startsWith('$2a$') && !u.password.startsWith('$2b$')) {
+    u.password = bcrypt.hashSync(u.password, 10);
+  }
+});
 
 // In-memory data store for Vercel (read-only filesystem)
 let inMemoryData = null;
@@ -266,18 +281,23 @@ class MockDbPool {
           }
         }
         if (norm.includes('from photos')) {
-          if (norm.includes('totalphotos')) {
+          if (norm.includes('totalphotosuploaded') || norm.includes('totalphotos')) {
             if (norm.includes('parent_id = ?') || norm.includes('parent_id=?')) {
               const pid = parseInt(params[0]);
               const parentUser = data.users.find(u => u.id === pid);
-              if (!parentUser) return [[{ totalPhotos: 0 }]];
+              if (!parentUser) return [[{ totalPhotosUploaded: 0, totalPhotos: 0 }]];
               const myStudentsIds = data.students.filter(s => s.parentEmail === parentUser.email).map(s => s.studentId);
               const matchingTags = data.student_tags.filter(t => myStudentsIds.includes(t.studentId));
               const myPhotoIds = [...new Set(matchingTags.map(t => t.photo_id))];
               const count = data.photos.filter(p => myPhotoIds.includes(p.id) && p.status === 'approved').length;
-              return [[{ totalPhotos: count }]];
+              return [[{ totalPhotosUploaded: count, totalPhotos: count }]];
             }
-            return [[{ totalPhotos: data.photos.length }]];
+            return [[{ totalPhotosUploaded: data.photos.length, totalPhotos: data.photos.length }]];
+          }
+          if (norm.includes('photosthisweek')) {
+            const start = params[0] ? new Date(params[0]) : new Date(0);
+            const count = data.photos.filter(p => new Date(p.uploaded_at) >= start).length;
+            return [[{ photosThisWeek: count }]];
           }
           if (norm.includes('pendingphotos') || norm.includes("status='pending'")) {
             const count = data.photos.filter(p => p.status === 'pending').length;
@@ -303,6 +323,14 @@ class MockDbPool {
           return [[{ totalAnnouncements: data.announcements.length }]];
         }
         if (norm.includes('from activities')) {
+          if (norm.includes('totalactivities')) {
+            return [[{ totalActivities: data.activities.length }]];
+          }
+          if (norm.includes('activitiesthisweek')) {
+            const start = params[0] ? new Date(params[0]) : new Date(0);
+            const count = data.activities.filter(a => new Date(a.activity_date) >= start).length;
+            return [[{ activitiesThisWeek: count }]];
+          }
           if (norm.includes('todayactivities')) {
             const tid = parseInt(params[0]);
             const date = params[1];
@@ -696,6 +724,7 @@ class MockDbPool {
           return {
             ...a,
             classroom_name: c ? c.classroom_name : '',
+            classroom: c ? c.classroom_name : '',
             teacher_name: u ? u.name : ''
           };
         }).sort((x, y) => new Date(y.created_at) - new Date(x.created_at));
@@ -724,6 +753,70 @@ class MockDbPool {
           counts[dateStr] = (counts[dateStr] || 0) + 1;
         });
         const list = Object.keys(counts).map(dt => ({ dt, count: counts[dt] }));
+        return [list];
+      }
+
+      // 8. admin dashboard and performance analytics
+      if (norm.includes('from activities') && norm.includes('group by category')) {
+        const counts = {};
+        data.activities.forEach(a => {
+          counts[a.category] = (counts[a.category] || 0) + 1;
+        });
+        const COLORS = ['#4F9CF9', '#F59E0B', '#22C55E', '#8B5CF6', '#EF4444', '#EC4899', '#06B6D4', '#84CC16'];
+        const list = Object.keys(counts).map((category, i) => ({
+          category,
+          count: counts[category],
+          color: COLORS[i % COLORS.length]
+        }));
+        return [list];
+      }
+
+      if (norm.includes('from teachers t')) {
+        const start = params[0] ? new Date(params[0]) : new Date(0);
+        const list = data.teachers.map(t => {
+          const u = data.users.find(usr => usr.id === t.user_id);
+          if (!u) return null;
+          
+          const uploads = data.photos.filter(p => p.uploaded_by === u.id).length;
+          const rangeUploads = data.photos.filter(p => p.uploaded_by === u.id && new Date(p.uploaded_at) >= start).length;
+          
+          const activitiesConducted = data.activities.filter(a => a.teacher_id === u.id).length;
+          const rangeActivities = data.activities.filter(a => a.teacher_id === u.id && new Date(a.activity_date) >= start).length;
+          
+          return {
+            user_id: u.id,
+            name: u.name,
+            teacherName: u.name,
+            classroom_name: t.classroom || '',
+            classroom: t.classroom || '',
+            uploads,
+            rangeUploads,
+            activitiesConducted,
+            rangeActivities,
+            parentEngagement: uploads * 2
+          };
+        }).filter(Boolean);
+        return [list];
+      }
+
+      if (norm.includes('from students s') && norm.includes('group by c.classroom_name')) {
+        const counts = {};
+        data.students.forEach(s => {
+          counts[s.classroom] = (counts[s.classroom] || 0) + 1;
+        });
+        const CLASS_COLORS = { 'Nursery': '#22C55E', 'LKG': '#4F9CF9', 'UKG': '#F59E0B' };
+        const list = Object.keys(counts).map(classroomName => {
+          const cls = classroomName || 'Nursery';
+          let matchedKey = 'Nursery';
+          if (cls.toLowerCase().includes('lkg')) matchedKey = 'LKG';
+          if (cls.toLowerCase().includes('ukg')) matchedKey = 'UKG';
+          return {
+            className: matchedKey,
+            classroom_name: cls,
+            count: counts[classroomName],
+            color: CLASS_COLORS[matchedKey] || '#22C55E'
+          };
+        });
         return [list];
       }
     }
@@ -1185,6 +1278,17 @@ module.exports = {
   execute: async (sql, params) => activePool.execute(sql, params),
   query: async (sql, params) => activePool.query(sql, params),
   getConnection: async () => activePool.getConnection(),
-  end: async () => activePool.end(),
+  end: async () => {
+    if (pool) {
+      try {
+        await pool.end();
+      } catch (e) {}
+    }
+    if (activePool && activePool !== pool) {
+      try {
+        await activePool.end();
+      } catch (e) {}
+    }
+  },
   isFallback: () => isFallback
 };

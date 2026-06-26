@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import {
   LayoutDashboard, BarChart3, Users, GraduationCap,
@@ -93,7 +93,7 @@ const Sidebar = () => {
               (route.path === '/parent' && currentPath === '/parent');
 
             return (
-              <NavLink
+              <Link
                 key={idx}
                 to={route.path}
                 className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
@@ -101,7 +101,7 @@ const Sidebar = () => {
               >
                 <span className="sidebar-nav-icon">{route.icon}</span>
                 <span className="sidebar-nav-label">{route.name}</span>
-              </NavLink>
+              </Link>
             );
           })}
         </nav>
