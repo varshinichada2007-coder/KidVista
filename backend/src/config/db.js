@@ -203,7 +203,7 @@ if (IS_VERCEL) {
 function mapStudentToDb(s, data) {
   if (!s) return null;
   const c = data.classrooms.find(cl => cl.classroom_name === s.classroom);
-  const u = data.users.find(usr => usr.email === s.parentEmail);
+  const u = data.users.find(usr => usr.email && s.parentEmail && usr.email.toLowerCase().trim() === s.parentEmail.toLowerCase().trim());
   return {
     id: s.studentId,
     student_id: s.studentId,
@@ -286,7 +286,7 @@ class MockDbPool {
               const pid = parseInt(params[0]);
               const parentUser = data.users.find(u => u.id === pid);
               if (!parentUser) return [[{ totalPhotosUploaded: 0, totalPhotos: 0 }]];
-              const myStudentsIds = data.students.filter(s => s.parentEmail === parentUser.email).map(s => s.studentId);
+              const myStudentsIds = data.students.filter(s => s.parentEmail && parentUser.email && s.parentEmail.toLowerCase().trim() === parentUser.email.toLowerCase().trim()).map(s => s.studentId);
               const matchingTags = data.student_tags.filter(t => myStudentsIds.includes(t.studentId));
               const myPhotoIds = [...new Set(matchingTags.map(t => t.photo_id))];
               const count = data.photos.filter(p => myPhotoIds.includes(p.id) && p.status === 'approved').length;
@@ -421,7 +421,7 @@ class MockDbPool {
         const pid = parseInt(params[0]);
         const parentUser = data.users.find(u => u.id === pid);
         if (!parentUser) return [[]];
-        const child = data.students.find(s => s.parentEmail === parentUser.email);
+        const child = data.students.find(s => s.parentEmail && parentUser.email && s.parentEmail.toLowerCase().trim() === parentUser.email.toLowerCase().trim());
         if (!child) return [[]];
         return [[{
           studentId: child.studentId,
@@ -449,7 +449,7 @@ class MockDbPool {
         const pid = parseInt(params[0]);
         const parentUser = data.users.find(u => u.id === pid);
         if (!parentUser) return [[]];
-        const myStudents = data.students.filter(s => s.parentEmail === parentUser.email);
+        const myStudents = data.students.filter(s => s.parentEmail && parentUser.email && s.parentEmail.toLowerCase().trim() === parentUser.email.toLowerCase().trim());
         const list = myStudents.map(s => {
           const mapped = mapStudentToDb(s, data);
           const classTeachers = data.teachers.filter(t => t.classroom === s.classroom);
@@ -575,6 +575,15 @@ class MockDbPool {
         return [match];
       }
 
+      if (norm.startsWith('select * from announcements') || norm.includes('from announcements')) {
+        return [data.announcements.map(a => ({
+          id: a.id,
+          title: a.title,
+          message: a.message,
+          created_at: a.created_at || a.createdAt || new Date().toISOString()
+        })).sort((x, y) => new Date(y.created_at) - new Date(x.created_at))];
+      }
+
       // 6. photos & activities & tags
       if (norm.startsWith('select * from photos where id = ?') || norm.startsWith('select * from photos where id=?')) {
         const id = parseInt(params[0]);
@@ -590,7 +599,7 @@ class MockDbPool {
         const pid = parseInt(params[0]);
         const parentUser = data.users.find(u => u.id === pid);
         if (!parentUser) return [[]];
-        const myStudentsIds = data.students.filter(s => s.parentEmail === parentUser.email).map(s => s.studentId);
+        const myStudentsIds = data.students.filter(s => s.parentEmail && parentUser.email && s.parentEmail.toLowerCase().trim() === parentUser.email.toLowerCase().trim()).map(s => s.studentId);
         const matchingTags = data.student_tags.filter(t => myStudentsIds.includes(t.studentId));
         const myPhotoIds = [...new Set(matchingTags.map(t => t.photo_id))];
         
@@ -666,7 +675,7 @@ class MockDbPool {
         const pid = parseInt(params[0]);
         const parentUser = data.users.find(u => u.id === pid);
         if (!parentUser) return [[]];
-        const myStudentsIds = data.students.filter(s => s.parentEmail === parentUser.email).map(s => s.studentId);
+        const myStudentsIds = data.students.filter(s => s.parentEmail && parentUser.email && s.parentEmail.toLowerCase().trim() === parentUser.email.toLowerCase().trim()).map(s => s.studentId);
         const matchingTags = data.student_tags.filter(t => myStudentsIds.includes(t.studentId));
         const myPhotoIds = [...new Set(matchingTags.map(t => t.photo_id))];
         const approvedPhotos = data.photos.filter(p => myPhotoIds.includes(p.id) && p.status === 'approved');
@@ -682,7 +691,7 @@ class MockDbPool {
         const pid = parseInt(params[0]);
         const parentUser = data.users.find(u => u.id === pid);
         if (!parentUser) return [[]];
-        const myStudentsIds = data.students.filter(s => s.parentEmail === parentUser.email).map(s => s.studentId);
+        const myStudentsIds = data.students.filter(s => s.parentEmail && parentUser.email && s.parentEmail.toLowerCase().trim() === parentUser.email.toLowerCase().trim()).map(s => s.studentId);
         const matchingTags = data.student_tags.filter(t => myStudentsIds.includes(t.studentId));
         const myPhotoIds = [...new Set(matchingTags.map(t => t.photo_id))];
         const approvedPhotos = data.photos.filter(p => myPhotoIds.includes(p.id) && p.status === 'approved');
@@ -1205,7 +1214,7 @@ class MockDbPool {
           if (u.role === 'teacher') {
             data.teachers = data.teachers.filter(t => t.user_id !== id);
           } else if (u.role === 'parent') {
-            data.students = data.students.map(s => s.parentEmail === u.email ? { ...s, parentEmail: '' } : s);
+            data.students = data.students.map(s => s.parentEmail && u.email && s.parentEmail.toLowerCase().trim() === u.email.toLowerCase().trim() ? { ...s, parentEmail: '' } : s);
           }
         }
         writeJSONDb(data);
