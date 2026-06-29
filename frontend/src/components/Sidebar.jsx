@@ -4,7 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import {
   LayoutDashboard, BarChart3, Users, GraduationCap,
   BookOpen, CheckSquare, Bell, Settings, LogOut,
-  Image, PlusCircle, Clock, User, UserCog, Menu, X
+  Image, PlusCircle, Clock, User, UserCog, Menu, X, MessageSquare
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -54,6 +54,7 @@ const Sidebar = () => {
           { path: '/parent/gallery', name: 'Photo Gallery', icon: <Image size={18} /> },
           { path: '/parent/attendance', name: 'Attendance', icon: <CheckSquare size={18} /> },
           { path: '/parent/notifications', name: 'Notifications', icon: <Bell size={18} /> },
+          { path: '/parent/feedback', name: 'Feedback & Surveys', icon: <MessageSquare size={18} /> },
           { path: '/parent/profile', name: 'Profile', icon: <User size={18} /> },
         ];
       default:

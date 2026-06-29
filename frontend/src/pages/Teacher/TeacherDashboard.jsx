@@ -295,22 +295,70 @@ const TeacherDashboard = () => {
     setShowAddActivityModal(false);
   };
 
-  // Attendance toggling
-  const handleAttendanceToggle = async (studentId, status) => {
+  // Attendance toggling locally
+  const handleAttendanceToggle = (studentId, status) => {
     setLocalAttendance(prev => ({
       ...prev,
       [studentId]: status
+    }));
+  };
+
+  const fetchAttendance = async (date) => {
+    console.log('[fetchAttendance] Fetching for date:', date);
+    try {
+      const response = await API.get(`/teacher/attendance?date=${date}`);
+      console.log('[fetchAttendance] Response rows:', response.data);
+      if (response.data && response.data.length > 0) {
+        const mapping = {};
+        response.data.forEach(item => {
+          mapping[item.student_id] = item.status.toLowerCase();
+        });
+        console.log('[fetchAttendance] Setting localAttendance mapping:', mapping);
+        setLocalAttendance(prev => ({
+          ...prev,
+          ...mapping
+        }));
+      } else {
+        console.log('[fetchAttendance] No records found. Initializing to present.');
+        const initialAtt = {};
+        students.forEach(s => {
+          initialAtt[s.id] = 'present';
+        });
+        setLocalAttendance(initialAtt);
+      }
+    } catch (err) {
+      console.error('Error fetching attendance:', err);
+    }
+  };
+
+  useEffect(() => {
+    console.log('[useEffect] tab:', activeTab, 'date:', attendanceDate, 'students length:', students.length);
+    if (activeTab === 'attendance' && attendanceDate && students.length > 0) {
+      fetchAttendance(attendanceDate);
+    }
+  }, [activeTab, attendanceDate, students]);
+
+  const handleAttendanceSubmit = async () => {
+    setUploading(true);
+    setAttendanceSuccess('');
+    setError('');
+    const list = students.map(student => ({
+      studentId: student.id,
+      status: localAttendance[student.id] || 'present'
     }));
 
     try {
       await API.post('/teacher/attendance', {
         date: attendanceDate,
-        attendanceList: [{ studentId, status }]
+        attendanceList: list
       });
-      setAttendanceSuccess('Attendance updated.');
-      setTimeout(() => setAttendanceSuccess(''), 1500);
+      setAttendanceSuccess('Attendance submitted successfully and shared with admin!');
+      setTimeout(() => setAttendanceSuccess(''), 3000);
     } catch (err) {
       console.error(err);
+      setError('Failed to submit classroom attendance.');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -969,6 +1017,17 @@ const TeacherDashboard = () => {
                         </div>
                       );
                     })}
+                  </div>
+                  
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem', borderTop: '1px solid #F1F5F9', paddingTop: '1.5rem' }}>
+                    <button 
+                      className="btn btn-primary" 
+                      onClick={handleAttendanceSubmit}
+                      disabled={uploading}
+                      style={{ padding: '0.6rem 2rem', borderRadius: '10px', fontWeight: 'bold' }}
+                    >
+                      {uploading ? 'Submitting...' : 'Submit Attendance'}
+                    </button>
                   </div>
                 </div>
               )}

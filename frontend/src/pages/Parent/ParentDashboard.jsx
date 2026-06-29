@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import Sidebar from '../../components/Sidebar';
-import API from '../../services/api';
+import API, { baseURL } from '../../services/api';
 import { 
   Heart, Calendar, Camera, Info, Bell, CheckSquare, 
   MessageSquare, User, Clock, ShieldCheck, HeartHandshake,
@@ -43,17 +43,21 @@ const ParentDashboard = () => {
   const [replyText, setReplyText] = useState('');
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
+  const [photos, setPhotos] = useState([]);
+  const [modalPhoto, setModalPhoto] = useState(null);
 
   const fetchDashboardData = async () => {
     try {
       // Fetch data for any parent user (even if user.status is undefined, treat as approved for local testing)
       if (user) {
-        const [progressRes, annRes] = await Promise.all([
+        const [progressRes, annRes, photosRes] = await Promise.all([
           API.get('/parent/progress'),
-          API.get('/parent/announcements')
+          API.get('/parent/announcements'),
+          API.get('/parent/photos')
         ]);
         setProgressData(progressRes.data);
         setAnnouncements(annRes.data);
+        setPhotos(photosRes.data || []);
       }
       
       // Load notifications
@@ -89,6 +93,58 @@ const ParentDashboard = () => {
       fetchDashboardData();
     } catch (err) {
       setNotifications(notifications.map(n => n.id === id ? { ...n, readStatus: 'read' } : n));
+    }
+  };
+
+  const handleNotificationClick = async (notif) => {
+    // If unread, mark as read on the backend
+    if (notif.readStatus === 'unread' || notif.read_status === 'unread') {
+      try {
+        await API.put(`/parent/notifications/${notif.id}/read`);
+        setNotifications(prev => 
+          prev.map(n => n.id === notif.id ? { ...n, readStatus: 'read', read_status: 'read' } : n)
+        );
+      } catch (err) {
+        console.error('Error marking notification as read:', err);
+      }
+    }
+    
+    // Check if it's a photo tag notification
+    const typeStr = notif.type || '';
+    let matched = null;
+
+    if (typeStr.startsWith('photo_tag:')) {
+      const photoId = parseInt(typeStr.split(':')[1]);
+      matched = photos.find(p => p.id === photoId);
+      if (!matched) {
+        try {
+          const res = await API.get('/parent/photos');
+          const latestPhotos = res.data || [];
+          setPhotos(latestPhotos);
+          matched = latestPhotos.find(p => p.id === photoId);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    } else if (typeStr === 'tag' || typeStr === 'photo' || (notif.message && notif.message.toLowerCase().includes('photo'))) {
+      // Fallback: search for a photo containing student's name mentioned in message
+      const msgLower = notif.message.toLowerCase();
+      matched = photos.find(p => {
+        return p.tags && p.tags.some(t => t.student_name && msgLower.includes(t.student_name.toLowerCase()));
+      });
+      if (!matched && photos.length > 0) {
+        matched = photos[0];
+      }
+    }
+
+    if (matched) {
+      setModalPhoto(matched);
+    } else {
+      if (typeStr === 'attendance') {
+        navigate('/parent?tab=attendance');
+      } else if (typeStr === 'photo' || typeStr === 'tag') {
+        navigate('/parent?tab=gallery');
+      }
     }
   };
 
@@ -134,21 +190,10 @@ const ParentDashboard = () => {
     { time: '04:00 PM', title: 'Departure', desc: 'Pickup with parents.', hasPhotos: false }
   ];
 
-  // Photo gallery items matching the categories
-  const galleryPhotos = [
-    { id: 1, category: 'Art & Craft', url: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&auto=format&fit=crop&q=80', desc: 'Painting brushes & watercolors' },
-    { id: 2, category: 'Art & Craft', url: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=600&auto=format&fit=crop&q=80', desc: 'Building blocks class activity' },
-    { id: 3, category: 'Outdoor Play', url: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=600&auto=format&fit=crop&q=80', desc: 'Running children outdoors' },
-    { id: 4, category: 'Story Time', url: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&auto=format&fit=crop&q=80', desc: 'Reading books at preschool table' },
-    { id: 5, category: 'Music', url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80', desc: 'Toddlers hand paint circle' },
-    { id: 6, category: 'Story Time', url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&auto=format&fit=crop&q=80', desc: 'Classroom reading circle' },
-    { id: 7, category: 'Outdoor Play', url: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&auto=format&fit=crop&q=80', desc: 'Preschool garden playground' },
-    { id: 8, category: 'Music', url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&auto=format&fit=crop&q=80', desc: 'Kids play with bricks' }
-  ];
-
+  // Photo gallery items matching the categories from backend
   const filteredPhotos = galleryFilter === 'All' 
-    ? galleryPhotos 
-    : galleryPhotos.filter(p => p.category === galleryFilter);
+    ? photos 
+    : photos.filter(p => (p.activity_category === galleryFilter || p.category === galleryFilter));
 
   const tabsList = [
     { id: 'overview', label: 'Overview', path: '/parent' },
@@ -443,21 +488,54 @@ const ParentDashboard = () => {
                   </div>
 
                   <div className="gallery-images-layout-grid">
-                    {filteredPhotos.map((photo) => (
-                      <div key={photo.id} className="gallery-photo-item-card">
-                        <img 
-                          src={photo.url} 
-                          alt={photo.desc} 
-                          className="gallery-photo-img-tag"
-                        />
-                        <div className="photo-floating-bottom-bar">
-                          <span className="photo-tag-badge">Tagged - {childFirst}</span>
-                          <button className="photo-download-hover-btn" title="Download Photo">
-                            <Download size={14} color="white" />
-                          </button>
-                        </div>
+                    {filteredPhotos.length === 0 ? (
+                      <div style={{ gridColumn: 'span 3', textAlign: 'center', padding: '3rem', color: '#94A3B8' }}>
+                        <ImageIcon size={36} style={{ opacity: 0.4, marginBottom: '0.5rem' }} />
+                        <p style={{ fontSize: '0.9rem', margin: 0 }}>No approved tagged photos of {childFirst} found matching the filter.</p>
                       </div>
-                    ))}
+                    ) : (
+                      filteredPhotos.map((photo) => {
+                        const imgUrl = photo.image_url || photo.url || '';
+                        const fullImgUrl = imgUrl.startsWith('http') ? imgUrl : `${baseURL}${imgUrl}`;
+                        return (
+                          <div key={photo.id} className="gallery-photo-item-card" onClick={() => setModalPhoto(photo)} style={{ cursor: 'pointer' }}>
+                            <img 
+                              src={fullImgUrl} 
+                              alt={photo.ai_caption || photo.desc} 
+                              className="gallery-photo-img-tag"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&auto=format&fit=crop&q=80";
+                              }}
+                            />
+                            <div className="photo-floating-bottom-bar">
+                              <span className="photo-tag-badge">Tagged - {childFirst}</span>
+                              <button 
+                                className="photo-download-hover-btn" 
+                                title="Download Photo"
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  try {
+                                    const res = await fetch(fullImgUrl);
+                                    const blob = await res.blob();
+                                    const link = document.createElement('a');
+                                    link.href = window.URL.createObjectURL(blob);
+                                    link.download = `kidvista-photo-${photo.id}.jpg`;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                  } catch (err) {
+                                    window.open(fullImgUrl, '_blank');
+                                  }
+                                }}
+                              >
+                                <Download size={14} color="white" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               )}
@@ -594,9 +672,9 @@ const ParentDashboard = () => {
                         <div
                           key={notif.id}
                           className="notif-feed-item-row"
-                          onClick={() => isUnread && handleMarkAsRead(notif.id)}
+                          onClick={() => handleNotificationClick(notif)}
                           style={{
-                            cursor: isUnread ? 'pointer' : 'default',
+                            cursor: 'pointer',
                             background: isUnread ? '#F0F7FF' : '#FFFFFF',
                             borderLeft: isUnread ? '3px solid #4F9CF9' : '3px solid transparent',
                             transition: 'all 0.2s'
@@ -670,6 +748,146 @@ const ParentDashboard = () => {
           )}
         </div>
       </div>
+
+      {/* Lightbox / Photo Detail Modal */}
+      {modalPhoto && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1.5rem'
+          }}
+          onClick={() => setModalPhoto(null)}
+        >
+          <div 
+            style={{
+              background: '#FFFFFF',
+              borderRadius: '20px',
+              maxWidth: '800px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              display: 'flex',
+              flexDirection: 'column',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button 
+              style={{
+                position: 'absolute',
+                top: '0.75rem',
+                right: '0.75rem',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: 'rgba(15, 23, 42, 0.08)',
+                border: 'none',
+                color: '#1E293B',
+                fontSize: '1.25rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 10
+              }}
+              onClick={() => setModalPhoto(null)}
+            >
+              &times;
+            </button>
+
+            {/* Split layout: Image top/left, Details bottom/right */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 0 }}>
+              {/* Image Pane */}
+              <div style={{ background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }}>
+                <img 
+                  src={modalPhoto.image_url.startsWith('http') ? modalPhoto.image_url : `${baseURL}${modalPhoto.image_url}`} 
+                  alt={modalPhoto.ai_caption}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '365px',
+                    objectFit: 'contain',
+                    borderRadius: '12px'
+                  }}
+                />
+              </div>
+
+              {/* Info Details Pane */}
+              <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
+                <div>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#4F9CF9', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {modalPhoto.activity_category || 'Preschool Activity'}
+                  </span>
+                  <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginTop: '0.25rem', marginBottom: '0.25rem', lineHeight: 1.2 }}>
+                    {modalPhoto.activity_title || 'Classroom Moment'}
+                  </h3>
+                  <p style={{ fontSize: '0.8rem', color: '#64748B', margin: 0 }}>
+                    Uploaded by {modalPhoto.teacher_name || 'Teacher'} on {new Date(modalPhoto.uploaded_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                </div>
+
+                <div style={{ background: '#F1F5F9', padding: '0.75rem 1rem', borderRadius: '12px', borderLeft: '4px solid #4F9CF9' }}>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: '#475569', display: 'block', marginBottom: '0.25rem' }}>AI CAPTION & SUMMARY</span>
+                  <p style={{ fontSize: '0.85rem', color: '#1E293B', fontStyle: 'italic', margin: 0, lineHeight: 1.4 }}>
+                    "{modalPhoto.ai_caption}"
+                  </p>
+                </div>
+
+                {modalPhoto.activity_description && (
+                  <div>
+                    <h5 style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '0.25rem' }}>Activity Description</h5>
+                    <p style={{ fontSize: '0.8rem', color: '#475569', margin: 0, lineHeight: 1.4 }}>
+                      {modalPhoto.activity_description}
+                    </p>
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid #E2E8F0' }}>
+                  <button 
+                    className="btn btn-primary"
+                    style={{ flex: 1, padding: '0.55rem 1rem', borderRadius: '10px', fontWeight: 'bold', fontSize: '0.85rem' }}
+                    onClick={async () => {
+                      const imgUrl = modalPhoto.image_url.startsWith('http') ? modalPhoto.image_url : `${baseURL}${modalPhoto.image_url}`;
+                      try {
+                        const res = await fetch(imgUrl);
+                        const blob = await res.blob();
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = `kidvista-photo-${modalPhoto.id}.jpg`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      } catch (err) {
+                        window.open(imgUrl, '_blank');
+                      }
+                    }}
+                  >
+                    Download Photo
+                  </button>
+                  <button 
+                    className="btn btn-outline"
+                    style={{ padding: '0.55rem 1.25rem', borderRadius: '10px', fontSize: '0.85rem' }}
+                    onClick={() => setModalPhoto(null)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         /* Global Portal Header styles */

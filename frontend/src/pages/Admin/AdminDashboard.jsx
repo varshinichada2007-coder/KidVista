@@ -93,6 +93,8 @@ const BarChart = ({ data, labelKey = 'date', valueKey = 'count', color = '#3B82F
 
 // SVG Multi-line Chart
 const MultiLineChart = ({ data, lines, xKey = 'week', height = 180 }) => {
+  const [tooltip, setTooltip] = useState(null);
+
   if (!data || data.length === 0) return <EmptyChart icon={<TrendingUp size={20} style={{ color: '#94A3B8' }} />} title="No attendance data" subtitle="Attendance records will be charted here as they're logged" height={height} />;
 
   const allVals = data.flatMap(d => lines.map(l => d[l.key] || 0));
@@ -114,38 +116,97 @@ const MultiLineChart = ({ data, lines, xKey = 'week', height = 180 }) => {
   const yTicks = [minVal, Math.round(minVal + range * 0.5), maxVal];
 
   return (
-    <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
-      {yTicks.map((v, i) => {
-        const y = getY(v);
-        return (
-          <g key={i}>
-            <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#F1F5F9" strokeWidth="1" />
-            <text x={padL - 4} y={y} textAnchor="end" dominantBaseline="middle" fontSize="8" fill="#CBD5E1">{v}%</text>
+    <div style={{ position: 'relative', width: '100%' }}>
+      <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
+        {yTicks.map((v, i) => {
+          const y = getY(v);
+          return (
+            <g key={i}>
+              <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#F1F5F9" strokeWidth="1" />
+              <text x={padL - 4} y={y} textAnchor="end" dominantBaseline="middle" fontSize="8" fill="#CBD5E1">{v}%</text>
+            </g>
+          );
+        })}
+        {lines.map(({ key, color, label: lineLabel }) => {
+          const pts = data.map((d, i) => `${getX(i)},${getY(d[key] || 0)}`).join(' ');
+          return (
+            <g key={key}>
+              <polyline 
+                fill="none" 
+                stroke={color} 
+                strokeWidth="2.5" 
+                points={pts} 
+                strokeLinejoin="round" 
+                strokeLinecap="round" 
+                opacity="0.9" 
+                style={{
+                  strokeDasharray: 1000,
+                  strokeDashoffset: 1000,
+                  animation: 'draw-line 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards'
+                }}
+              />
+              {data.map((d, i) => (
+                <circle 
+                  key={i} 
+                  cx={getX(i)} 
+                  cy={getY(d[key] || 0)} 
+                  r="0"
+                  fill="white" 
+                  stroke={color} 
+                  strokeWidth="2.5" 
+                  style={{
+                    animation: 'pop-dot 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                    animationDelay: `${(i / Math.max(data.length, 1)) * 1.5 + 0.3}s`,
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={() => setTooltip({
+                    x: getX(i),
+                    y: getY(d[key] || 0),
+                    val: d[key] || 0,
+                    label: `${lineLabel}: ${d[key]}%`
+                  })}
+                  onMouseLeave={() => setTooltip(null)}
+                />
+              ))}
+            </g>
+          );
+        })}
+        {data.map((d, i) => (
+          <text key={i} x={getX(i)} y={H - 6} textAnchor="middle" fontSize="8" fill="#94A3B8" fontWeight="500">{d[xKey]}</text>
+        ))}
+        <line x1={padL} x2={W - padR} y1={padT + chartH} y2={padT + chartH} stroke="#E2E8F0" strokeWidth="1" />
+        
+        {tooltip && (
+          <g>
+            <rect 
+              x={tooltip.x - 45} 
+              y={tooltip.y - 32} 
+              width={90} 
+              height={22} 
+              rx="6" 
+              fill="#0F172A" 
+            />
+            <text 
+              x={tooltip.x} 
+              y={tooltip.y - 18} 
+              textAnchor="middle" 
+              fontSize="9" 
+              fill="#FFFFFF" 
+              fontWeight="bold"
+            >
+              {tooltip.label}
+            </text>
           </g>
-        );
-      })}
-      {lines.map(({ key, color }) => {
-        const pts = data.map((d, i) => `${getX(i)},${getY(d[key] || 0)}`).join(' ');
-        return (
-          <g key={key}>
-            <polyline fill="none" stroke={color} strokeWidth="2.5" points={pts} strokeLinejoin="round" strokeLinecap="round" opacity="0.9" />
-            {data.map((d, i) => (
-              <circle key={i} cx={getX(i)} cy={getY(d[key] || 0)} r="4"
-                fill="white" stroke={color} strokeWidth="2.5" />
-            ))}
-          </g>
-        );
-      })}
-      {data.map((d, i) => (
-        <text key={i} x={getX(i)} y={H - 6} textAnchor="middle" fontSize="8" fill="#94A3B8" fontWeight="500">{d[xKey]}</text>
-      ))}
-      <line x1={padL} x2={W - padR} y1={padT + chartH} y2={padT + chartH} stroke="#E2E8F0" strokeWidth="1" />
-    </svg>
+        )}
+      </svg>
+    </div>
   );
 };
 
-// SVG Area Chart â€” with gradient fill and dot indicators
+// SVG Area Chart — with gradient fill and dot indicators
 const AreaChart = ({ data, xKey = 'day', yKey = 'views', color = '#22C55E', height = 180 }) => {
+  const [tooltip, setTooltip] = useState(null);
+
   if (!data || data.length === 0) return <EmptyChart icon={<Users size={20} style={{ color: '#94A3B8' }} />} title="No engagement data" subtitle="Parent photo views will be tracked here" height={height} />;
 
   const vals = data.map(d => d[yKey] || 0);
@@ -162,44 +223,84 @@ const AreaChart = ({ data, xKey = 'day', yKey = 'views', color = '#22C55E', heig
 
   const pts = data.map((d, i) => `${getX(i)},${getY(d[yKey] || 0)}`);
   const areaPath = data.length === 1
-    ? '' // single point â€” skip area
+    ? '' // single point — skip area
     : `M ${getX(0)},${padT + chartH} L ${pts.join(' L ')} L ${getX(data.length - 1)},${padT + chartH} Z`;
 
   const gradId = `areaG_${color.replace('#', '')}`;
   const yTicks = [0, Math.round(maxVal * 0.5), maxVal];
 
   return (
-    <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.25" />
-          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
-        </linearGradient>
-      </defs>
-      {yTicks.map((v, i) => {
-        const y = getY(v);
-        return (
-          <g key={i}>
-            <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#F1F5F9" strokeWidth="1" />
-            <text x={padL - 4} y={y} textAnchor="end" dominantBaseline="middle" fontSize="8" fill="#CBD5E1">{v}</text>
+    <div style={{ position: 'relative', width: '100%' }}>
+      <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.25" />
+            <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+        {yTicks.map((v, i) => {
+          const y = getY(v);
+          return (
+            <g key={i}>
+              <line x1={padL} x2={W - padR} y1={y} y2={y} stroke="#F1F5F9" strokeWidth="1" />
+              <text x={padL - 4} y={y} textAnchor="end" dominantBaseline="middle" fontSize="8" fill="#CBD5E1">{v}</text>
+            </g>
+          );
+        })}
+        {areaPath && <path d={areaPath} fill={`url(#${gradId})`} />}
+        {data.length > 1 && <polyline fill="none" stroke={color} strokeWidth="2.5" points={pts.join(' ')} strokeLinejoin="round" strokeLinecap="round" />}
+        {data.map((d, i) => {
+          const val = d[yKey] || 0;
+          if (val === 0) return null;
+          return (
+            <circle 
+              key={i} 
+              cx={getX(i)} 
+              cy={getY(val)} 
+              r="5"
+              fill="white" 
+              stroke={color} 
+              strokeWidth="2.5" 
+              style={{ cursor: 'pointer' }}
+              onMouseEnter={() => setTooltip({
+                x: getX(i),
+                y: getY(val),
+                val,
+                label: `${d[xKey]}: ${val} alert${val !== 1 ? 's' : ''}`
+              })}
+              onMouseLeave={() => setTooltip(null)}
+            />
+          );
+        })}
+        {data.map((d, i) => (
+          <text key={i} x={getX(i)} y={H - 6} textAnchor="middle" fontSize="8" fill="#94A3B8" fontWeight="500">{d[xKey]}</text>
+        ))}
+        <line x1={padL} x2={W - padR} y1={padT + chartH} y2={padT + chartH} stroke="#E2E8F0" strokeWidth="1" />
+
+        {tooltip && (
+          <g>
+            <rect 
+              x={tooltip.x - 55} 
+              y={tooltip.y - 32} 
+              width={110} 
+              height={22} 
+              rx="6" 
+              fill="#0F172A" 
+            />
+            <text 
+              x={tooltip.x} 
+              y={tooltip.y - 18} 
+              textAnchor="middle" 
+              fontSize="9" 
+              fill="#FFFFFF" 
+              fontWeight="bold"
+            >
+              {tooltip.label}
+            </text>
           </g>
-        );
-      })}
-      {areaPath && <path d={areaPath} fill={`url(#${gradId})`} />}
-      {data.length > 1 && <polyline fill="none" stroke={color} strokeWidth="2.5" points={pts.join(' ')} strokeLinejoin="round" strokeLinecap="round" />}
-      {data.map((d, i) => {
-        const val = d[yKey] || 0;
-        if (val === 0) return null;
-        return (
-          <circle key={i} cx={getX(i)} cy={getY(val)} r="5"
-            fill="white" stroke={color} strokeWidth="2.5" />
-        );
-      })}
-      {data.map((d, i) => (
-        <text key={i} x={getX(i)} y={H - 6} textAnchor="middle" fontSize="8" fill="#94A3B8" fontWeight="500">{d[xKey]}</text>
-      ))}
-      <line x1={padL} x2={W - padR} y1={padT + chartH} y2={padT + chartH} stroke="#E2E8F0" strokeWidth="1" />
-    </svg>
+        )}
+      </svg>
+    </div>
   );
 };
 
@@ -647,10 +748,84 @@ const AdminDashboard = () => {
                   <div className="adm-chart-header">
                     <div>
                       <h3 className="adm-chart-title">Student distribution</h3>
-                      <p className="adm-chart-sub">By class â€” {studentDistribution.reduce((a, b) => a + (b.count || 0), 0)} total</p>
+                      <p className="adm-chart-sub">By class — {studentDistribution.reduce((a, b) => a + (b.count || 0), 0)} total</p>
                     </div>
                   </div>
                   <PieChart data={studentDistribution} labelKey="className" valueKey="count" colorKey="color" />
+                </div>
+              </div>
+
+              {/* Row 4: Parent Feedback & Survey Responses */}
+              <div className="adm-charts-row" style={{ gridTemplateColumns: '1fr' }}>
+                <div className="adm-chart-card" style={{ width: '100%' }}>
+                  <div className="adm-chart-header" style={{ borderBottom: '1px solid #F1F5F9', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+                    <div>
+                      <h3 className="adm-chart-title">Parent Feedback & Survey Responses</h3>
+                      <p className="adm-chart-sub">Real-time ratings and suggestions submitted by preschool parents</p>
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                    {stats?.parentFeedback && stats.parentFeedback.length > 0 ? (
+                      stats.parentFeedback.map((fb, idx) => {
+                        const score = fb.survey_rating || fb.surveyRating || 5;
+                        const parentName = fb.parent_name || fb.parentName || 'Preschool Parent';
+                        
+                        return (
+                          <div 
+                            key={fb.id || idx}
+                            style={{ 
+                              display: 'flex', 
+                              gap: '1rem', 
+                              padding: '1rem', 
+                              background: '#F8FAFC', 
+                              borderRadius: '10px', 
+                              border: '1px solid #E2E8F0',
+                              textAlign: 'left'
+                            }}
+                          >
+                            <div 
+                              style={{ 
+                                display: 'flex', 
+                                flexDirection: 'column', 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                width: '48px', 
+                                height: '48px', 
+                                background: '#FFFBEB', 
+                                borderRadius: '50%', 
+                                color: '#D97706', 
+                                fontWeight: '800',
+                                border: '1px solid #FDE68A',
+                                flexShrink: 0
+                              }}
+                            >
+                              <span style={{ fontSize: '0.75rem', lineHeight: 1 }}>★</span>
+                              <span style={{ fontSize: '0.85rem' }}>{score}</span>
+                            </div>
+                            
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                                <span style={{ fontWeight: 700, color: '#1E293B', fontSize: '0.875rem' }}>
+                                  {parentName} <span style={{ fontWeight: 400, color: '#94A3B8', fontSize: '0.78rem' }}>({fb.parent_email})</span>
+                                </span>
+                                <span style={{ fontSize: '0.75rem', color: '#94A3B8' }}>
+                                  {new Date(fb.date || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </span>
+                              </div>
+                              <p style={{ margin: 0, fontSize: '0.875rem', color: '#475569', fontStyle: 'italic', lineHeight: 1.4 }}>
+                                "{fb.feedback_text || fb.feedbackText}"
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#94A3B8', fontSize: '0.85rem' }}>
+                        No survey responses or feedback notes received from parents yet.
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </>
@@ -903,6 +1078,16 @@ const AdminDashboard = () => {
 
       <style>{`
         @keyframes adm-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes draw-line {
+          to {
+            stroke-dashoffset: 0;
+          }
+        }
+        @keyframes pop-dot {
+          to {
+            r: 4;
+          }
+        }
 
         .adm-content {
           padding: 1.75rem 2rem 3rem;

@@ -187,6 +187,14 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/parent/feedback"
+        element={
+          <ProtectedRoute allowedRoles={['parent']}>
+            <ParentFeedback />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Fallback Route */}
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -26,26 +26,12 @@ const Login = () => {
   const [resetSuccess, setResetSuccess] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
 
-  // Clear inputs and pre-fill demo credentials when role is changed
+  // Clear inputs when role is changed (do NOT pre-fill credentials)
   useEffect(() => {
     setError('');
-    if (selectedRole === 'parent') {
-      setEmail('Rajesh@KidVista.com');
-      setPassword('Rajesh@123');
-      setAdminSecret('');
-    } else if (selectedRole === 'teacher') {
-      setEmail('Aadhya@Kidvista.com');
-      setPassword('Aadhya@789');
-      setAdminSecret('');
-    } else if (selectedRole === 'admin') {
-      setEmail('akhilkumarchada86@gmail.com');
-      setPassword('Akhil@0806');
-      setAdminSecret('Varshini@20');
-    } else {
-      setEmail('');
-      setPassword('');
-      setAdminSecret('');
-    }
+    setEmail('');
+    setPassword('');
+    setAdminSecret('');
   }, [selectedRole]);
 
   const handleDemoFillAndSubmit = async (e) => {
@@ -295,13 +281,7 @@ const Login = () => {
               </button>
             </form>
 
-            <div className="demo-fill-card" onClick={handleDemoFillAndSubmit}>
-              <span className="fill-icon">🔑</span>
-              <div>
-                <strong>Demo credentials pre-filled</strong>
-                <p>Click Sign In to explore</p>
-              </div>
-            </div>
+
 
             <div className="secure-login-notice">
               <Lock size={14} color="var(--color-primary)" />
