@@ -69,6 +69,7 @@ router.post('/photos/:photoId/tags', teacherController.updatePhotoTags);
 router.get('/history', teacherController.getUploadHistory);
 
 // Attendance
+router.get('/attendance', teacherController.getAttendance);
 router.post('/attendance', teacherController.markAttendance);
 
 // Routines

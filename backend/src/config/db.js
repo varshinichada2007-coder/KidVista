@@ -828,6 +828,140 @@ class MockDbPool {
         });
         return [list];
       }
+
+      // 9. Attendance matching dates
+      if (norm.includes('from attendance') && norm.includes('date = ?')) {
+        const date = params[0];
+        const list = data.attendance
+          .filter(a => a.date === date)
+          .map(a => ({
+            student_id: a.studentId,
+            status: a.status
+          }));
+        return [list];
+      }
+
+      if (norm.includes('from attendance') && norm.includes('student_id = ?') && norm.includes('date = ?')) {
+        const sid = parseInt(params[0]);
+        const date = params[1];
+        const list = data.attendance
+          .filter(a => a.studentId === sid && a.date === date)
+          .map(a => ({ id: a.id }));
+        return [list];
+      }
+
+      // 10. Notifications matching parents
+      if (norm.includes('from notifications') && norm.includes('lower(trim(parent_email)) = ?')) {
+        const email = params[0].trim().toLowerCase();
+        const list = data.notifications
+          .filter(n => n.parentEmail && n.parentEmail.trim().toLowerCase() === email)
+          .map(n => ({
+            id: n.id,
+            parentEmail: n.parentEmail,
+            parent_email: n.parentEmail,
+            message: n.message,
+            type: n.type || 'attendance',
+            readStatus: n.readStatus || 'unread',
+            read_status: n.readStatus || 'unread',
+            createdAt: n.createdAt,
+            created_at: n.createdAt
+          }));
+        return [list];
+      }
+
+      if (norm.includes('from notifications') && norm.includes('parent_email = ?') && norm.includes('message = ?')) {
+        const email = params[0].trim().toLowerCase();
+        const msg = params[1];
+        const list = data.notifications
+          .filter(n => n.parentEmail && n.parentEmail.trim().toLowerCase() === email && n.message === msg)
+          .map(n => ({ id: n.id }));
+        return [list];
+      }
+
+      // 11. Feedback
+      if (norm.includes('from feedback f') || norm.includes('from feedback')) {
+        const list = data.feedback.map(f => {
+          const u = data.users.find(usr => usr.email && f.parentEmail && usr.email.toLowerCase().trim() === f.parentEmail.toLowerCase().trim());
+          return {
+            id: f.id,
+            parent_email: f.parentEmail,
+            parentEmail: f.parentEmail,
+            feedback_text: f.feedbackText,
+            feedbackText: f.feedbackText,
+            survey_rating: f.surveyRating,
+            surveyRating: f.surveyRating,
+            parent_name: u ? u.name : 'Parent',
+            date: f.date || new Date().toISOString()
+          };
+        }).sort((x, y) => new Date(y.date) - new Date(x.date));
+        return [list];
+      }
+
+      // 12. Attendance Trend
+      if (norm.includes('from attendance a') && norm.includes('where a.date >= date_sub')) {
+        const list = data.attendance.map(a => {
+          const s = data.students.find(stud => stud.studentId === a.studentId);
+          return {
+            date: a.date,
+            status: a.status,
+            classroom_name: s ? s.classroom : 'Nursery'
+          };
+        });
+        return [list];
+      }
+
+      // 13. Student tags for notification
+      if (norm.includes('from student_tags') && norm.includes('photo_id = ?')) {
+        const photoId = parseInt(params[0]);
+        const list = data.student_tags
+          .filter(t => t.photoId === photoId || t.photo_id === photoId)
+          .map(t => ({ student_id: t.studentId || t.student_id }));
+        return [list];
+      }
+
+      // 14. Parent email lookup
+      if (norm.includes('from students s') && norm.includes('left join users u') && norm.includes('s.id = ?')) {
+        const studentId = parseInt(params[0]);
+        const student = data.students.find(s => s.id === studentId || s.studentId === studentId);
+        if (student) {
+          const parent = data.users.find(u => u.id === student.parent_id || (student.parentEmail && u.email && u.email.toLowerCase().trim() === student.parentEmail.toLowerCase().trim()));
+          return [[{
+            student_name: student.student_name || student.name,
+            parentEmail: parent ? parent.email : student.parentEmail
+          }]];
+        }
+        return [[]];
+      }
+
+      // 15. Activities list for parent child's day timeline
+      if (norm.includes('from activities a') && norm.includes('parent_id = ?')) {
+        const parentId = parseInt(params[0]);
+        const parentUser = data.users.find(u => u.id === parentId);
+        if (!parentUser) return [[]];
+        
+        const parentEmail = parentUser.email.toLowerCase().trim();
+        const myClassrooms = data.students
+          .filter(s => s.parentEmail && s.parentEmail.toLowerCase().trim() === parentEmail)
+          .map(s => s.classroom);
+          
+        const list = data.activities.filter(a => {
+          const classObj = data.classrooms.find(c => c.id === a.classroom_id);
+          return classObj && myClassrooms.includes(classObj.classroom_name);
+        }).map(a => {
+          const classObj = data.classrooms.find(c => c.id === a.classroom_id);
+          return {
+            id: a.id,
+            title: a.title,
+            description: a.description,
+            category: a.category,
+            activity_date: a.activity_date,
+            ai_summary: a.ai_summary,
+            classroom_name: classObj ? classObj.classroom_name : 'Nursery'
+          };
+        }).sort((x, y) => new Date(y.activity_date) - new Date(x.activity_date));
+        
+        return [list];
+      }
     }
 
     // INSERT statements

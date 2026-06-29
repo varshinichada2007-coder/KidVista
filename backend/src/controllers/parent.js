@@ -124,7 +124,7 @@ exports.getTimeline = async (req, res) => {
       return res.status(200).json([]);
     }
 
-    // Get activities for parent's children
+    // Get activities for parent's children (by classroom)
     const [activities] = await db.query(`
       SELECT DISTINCT 
         a.id,
@@ -136,11 +136,9 @@ exports.getTimeline = async (req, res) => {
         c.classroom_name
       FROM activities a
       LEFT JOIN classrooms c ON a.classroom_id = c.id
-      JOIN photos p ON a.id = p.activity_id
-      JOIN student_tags st ON p.id = st.photo_id
-      JOIN students s ON st.student_id = s.id
-      WHERE s.parent_id = ? AND p.status = 'approved'
-      ORDER BY a.activity_date DESC
+      JOIN students s ON s.classroom_id = a.classroom_id
+      WHERE s.parent_id = ?
+      ORDER BY a.activity_date DESC, a.created_at DESC
     `, [parentId]);
 
     res.status(200).json(activities);
@@ -487,7 +485,8 @@ exports.getChildProgress = async (req, res) => {
 
 // 9. Submit parent feedback / survey responses
 exports.submitFeedback = async (req, res) => {
-  const { feedbackText, surveyRating } = req.body;
+  const feedbackText = req.body.feedbackText || req.body.message;
+  const surveyRating = req.body.surveyRating || req.body.rating || 5;
   const parentId = req.user.id;
 
   if (!feedbackText) {

@@ -199,7 +199,20 @@ exports.getUploadHistory = async (req, res) => {
   }
 };
 
-// 7. Mark or update student attendance
+// 7. Get attendance by date for teacher
+exports.getAttendance = async (req, res) => {
+  const { date } = req.query;
+  if (!date) return res.status(400).json({ message: 'Date is required.' });
+  try {
+    const [rows] = await db.query('SELECT student_id, status FROM attendance WHERE date = ?', [date]);
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('getAttendance error:', error);
+    res.status(500).json({ message: 'Error retrieving attendance.' });
+  }
+};
+
+// 7.1. Mark or update student attendance
 exports.markAttendance = async (req, res) => {
   const { date, attendanceList } = req.body;
   if (!date || !attendanceList || !Array.isArray(attendanceList)) {
@@ -213,6 +226,31 @@ exports.markAttendance = async (req, res) => {
         await db.execute('UPDATE attendance SET status = ? WHERE id = ?', [item.status, existing[0].id]);
       } else {
         await db.execute('INSERT INTO attendance (student_id, date, status) VALUES (?, ?, ?)', [item.studentId, date, item.status]);
+      }
+
+      // If marked Absent, send a parent notification
+      if (item.status && item.status.toLowerCase() === 'absent') {
+        const [studentInfo] = await db.query(
+          'SELECT s.student_name, u.email as parentEmail FROM students s LEFT JOIN users u ON s.parent_id = u.id WHERE s.id = ?',
+          [item.studentId]
+        );
+        if (studentInfo.length > 0 && studentInfo[0].parentEmail) {
+          const parentEmail = studentInfo[0].parentEmail.trim().toLowerCase();
+          const studentName = studentInfo[0].student_name;
+          const msg = `Dear parent, your child ${studentName} was marked absent today (${date}).`;
+
+          // Check if notification already exists to prevent duplicate spam
+          const [notifExists] = await db.query(
+            'SELECT id FROM notifications WHERE parent_email = ? AND message = ?',
+            [parentEmail, msg]
+          );
+          if (notifExists.length === 0) {
+            await db.execute(
+              'INSERT INTO notifications (parent_email, message, type, read_status) VALUES (?, ?, ?, ?)',
+              [parentEmail, msg, 'attendance', 'unread']
+            );
+          }
+        }
       }
     }
     res.status(200).json({ message: 'Attendance records updated successfully.' });

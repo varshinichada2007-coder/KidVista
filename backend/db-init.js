@@ -406,15 +406,39 @@ async function init() {
       seedData.photos[0].uploaded_by
     ]);
 
-    // Tag Aarav Patel in the photo
-    await connection.execute(`
-      INSERT INTO student_tags (id, photo_id, student_id)
-      VALUES (?, ?, ?)
-    `, [
-      seedData.student_tags[0].id,
-      seedData.student_tags[0].photo_id,
-      seedData.student_tags[0].student_id
-    ]);
+    // Tag students in the photo
+    for (const tag of seedData.student_tags) {
+      await connection.execute(`
+        INSERT INTO student_tags (id, photo_id, student_id)
+        VALUES (?, ?, ?)
+      `, [
+        tag.id,
+        tag.photo_id,
+        tag.student_id
+      ]);
+    }
+
+    // Seed Daily Attendance history (last 30 days)
+    console.log('Seeding daily attendance history...');
+    const studentsRows = seedData.students;
+    const today = new Date();
+    for (let i = 28; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      // Skip weekends
+      if (d.getDay() === 0 || d.getDay() === 6) continue;
+      const dateString = d.toISOString().split('T')[0];
+
+      for (const s of studentsRows) {
+        // 90% present, 10% absent
+        const status = Math.random() > 0.1 ? 'Present' : 'Absent';
+        await connection.execute(
+          'INSERT INTO attendance (student_id, date, status) VALUES (?, ?, ?)',
+          [s.id, dateString, status]
+        );
+      }
+    }
+    console.log('✔ Attendance history seeded.');
 
     console.log('✔ MySQL Seeding completed successfully.');
     console.log('\n--- DEMO ACCOUNTS CREDENTIALS ---');
